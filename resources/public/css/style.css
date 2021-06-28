@@ -9,12 +9,8 @@ html {
   background-color: #f2f2f2;
   width: 720px;
   margin: 0 auto;
-  font-family: sans-serif;
+  font-family: Roboto;
 }
-
-h1, h2, h3 {
-  font-family: "Gilbert Color"; 
-}	
 
 h1 {
   font-size: 4em;
