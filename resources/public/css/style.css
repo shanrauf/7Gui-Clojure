@@ -1,0 +1,98 @@
+/* Makes it a lot easier to align
+   elements.
+   Most visible in the flight booker example*/
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: #f2f2f2;
+  width: 720px;
+  margin: 0 auto;
+  font-family: sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: "Gilbert Color"; 
+}	
+
+h1 {
+  font-size: 4em;
+}
+
+h2 {
+  font-size: 3em;
+}
+
+.counter input {
+  width: 400px;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.counter button {
+  width: 400px;
+  margin: 0;
+  padding: 0;
+}
+
+.flight-booker input,
+.flight-booker select,
+.flight-booker button {
+  display: block;
+  width: 240px;
+}
+
+.crud form {
+  display: flex;
+  flex-direction: column;
+  width: 480px;
+}
+
+.crud form > * {
+  margin: 0 0 8px 0;
+}
+
+.crud .values {
+  display: flex;
+  flex-direction: row;
+}
+
+.crud .values select {
+  flex: 3;
+}
+
+.crud .name-editor {
+  display: flex;
+  flex-direction: column;
+}
+
+.crud .name-editor > * {
+  margin: 0 0 8px 8px;
+}
+
+.crud .crudbuttons input {
+  margin: 0 32px 0 0;
+}
+
+.circle-drawer {
+  width: 100%;
+}
+
+.circle-drawer > div > * {
+  margin: 8px;
+}
+
+.circle-drawer canvas {
+  border: 1px solid grey;
+}
+
+.undo-redo-controls {
+  display: flex;
+}
+
+.undo-redo-controls input {
+  flex: 1;
+}
