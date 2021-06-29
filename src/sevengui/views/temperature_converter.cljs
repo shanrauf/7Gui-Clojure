@@ -17,12 +17,18 @@
 (defn update_temperatures [param invalidates input]
   (cond
     ;; Empty input
-    (= input "") (swap! temperatures (fn [data] (-> data (assoc param input) (assoc invalidates input))))
+    (= input "") (swap! temperatures (fn [data] (-> data
+                                                    (assoc param input)
+                                                    (assoc invalidates input))))
     ;; Invalid input
     (js/isNaN input) (swap! temperatures (fn [data] (assoc data param input)))
     ;; Valid input
     :else (let [new_value (js/parseInt input)]
-            (swap! temperatures (fn [data] (-> data (assoc param (js/parseInt new_value)) (assoc invalidates (if (= param :fahrenheit) (celsius-to-fahrenheit new_value) (fahrenheit-to-celsius new_value)))))))))
+            (swap! temperatures (fn [data]
+                                  (-> data (assoc param (js/parseInt new_value))
+                                      (assoc invalidates (if (= param :fahrenheit)
+                                                           (celsius-to-fahrenheit new_value)
+                                                           (fahrenheit-to-celsius new_value)))))))))
 
 
 ;; -------------------------

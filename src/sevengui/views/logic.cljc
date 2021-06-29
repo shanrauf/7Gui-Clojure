@@ -1,2 +1,0 @@
-(ns sevengui.views.logic)
-
