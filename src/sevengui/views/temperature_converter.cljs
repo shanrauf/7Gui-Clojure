@@ -1,13 +1,11 @@
 (ns sevengui.views.temperature-converter
   (:require [reagent.core :as r]))
 
+;; -------------------------
+;; Logic
 
-(comment "TODO: validate inputs; don't update other value if entered value is invalid;
-          validator for the fahrenheit and celsius value prob?")
-
-(enable-console-print!)
-
-(def temperatures (r/atom {:fahrenheit 41 :celsius 5}))
+;; -------------------------
+(def temperatures (r/atom {:fahrenheit "" :celsius ""}))
 
 (defn fahrenheit-to-celsius [fahrenheit]
   (* (- fahrenheit 32) (/ 5 9)))
@@ -15,20 +13,28 @@
 (defn celsius-to-fahrenheit [celsius]
   (+ (* celsius (/ 9 5)) 32))
 
-(comment "TODO: This feels unclean cuz you call the same if statement twice and ref :fahrenheit/:celsius raw....")
-(defn update_temperatures [param, new_value]
-  (swap! temperatures (fn [data]
-                        (-> data
-                            (assoc param new_value)
-                            (assoc (if (= param :fahrenheit) :celsius :fahrenheit) (if (= param :fahrenheit) (celsius-to-fahrenheit new_value) (fahrenheit-to-celsius new_value)))))))
+;; Implemented exactly how the spec specifies
+(defn update_temperatures [param invalidates input]
+  (cond
+    ;; Empty input
+    (= input "") (swap! temperatures (fn [data] (-> data (assoc param input) (assoc invalidates input))))
+    ;; Invalid input
+    (js/isNaN input) (swap! temperatures (fn [data] (assoc data param input)))
+    ;; Valid input
+    :else (let [new_value (js/parseInt input)]
+            (swap! temperatures (fn [data] (-> data (assoc param (js/parseInt new_value)) (assoc invalidates (if (= param :fahrenheit) (celsius-to-fahrenheit new_value) (fahrenheit-to-celsius new_value)))))))))
 
 
-(defn temperature-input [param val]
+;; -------------------------
+;; View
+
+;; -------------------------
+(defn temperature-input [param invalidates val]
   [:input {:value val :on-change (fn [e]
-                                   (update_temperatures param (js/parseInt (.. e -target -value))))}])
+                                   (update_temperatures param, invalidates (.. e -target -value)))}])
 
 (defn format-temperature [temp]
-  (str (Math/round (float temp))))
+  (if (string? temp) temp (str (Math/round (float temp)))))
 
 
 (defn temperature-converter-component []
@@ -38,7 +44,7 @@
      [:div {:class "temperature-converter"}
       [:div {:class "temperature"}
        [:label "Celsius"]
-       [temperature-input :celsius (format-temperature celsius)]]
+       [temperature-input :celsius :fahrenheit (format-temperature celsius)]]
       [:div {:class "temperature"}
        [:label "Fahrenheit"]
-       [temperature-input :fahrenheit (format-temperature fahrenheit)]]]]))
+       [temperature-input :fahrenheit :celsius (format-temperature fahrenheit)]]]]))
