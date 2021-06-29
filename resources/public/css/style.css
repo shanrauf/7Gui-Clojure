@@ -1,6 +1,3 @@
-/* Makes it a lot easier to align
-   elements.
-   Most visible in the flight booker example*/
 * {
   box-sizing: border-box;
 }
@@ -20,75 +17,12 @@ h2 {
   font-size: 3em;
 }
 
-.counter input {
-  width: 400px;
-  display: block;
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
-.counter button {
-  width: 400px;
-  margin: 0;
-  padding: 0;
-}
-
-.flight-booker input,
-.flight-booker select,
-.flight-booker button {
-  display: block;
-  width: 240px;
-}
-
-.crud form {
-  display: flex;
-  flex-direction: column;
-  width: 480px;
-}
-
-.crud form > * {
-  margin: 0 0 8px 0;
-}
-
-.crud .values {
+.temperature-converter {
   display: flex;
   flex-direction: row;
 }
 
-.crud .values select {
-  flex: 3;
-}
-
-.crud .name-editor {
+.temperature {
   display: flex;
   flex-direction: column;
-}
-
-.crud .name-editor > * {
-  margin: 0 0 8px 8px;
-}
-
-.crud .crudbuttons input {
-  margin: 0 32px 0 0;
-}
-
-.circle-drawer {
-  width: 100%;
-}
-
-.circle-drawer > div > * {
-  margin: 8px;
-}
-
-.circle-drawer canvas {
-  border: 1px solid grey;
-}
-
-.undo-redo-controls {
-  display: flex;
-}
-
-.undo-redo-controls input {
-  flex: 1;
 }
