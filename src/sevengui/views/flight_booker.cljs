@@ -21,24 +21,24 @@
 ;; Logic
 
 ;; -------------------------
-(defn str-to-date [s]
+(defn- str-to-date [s]
   (let [[_ day month year] (re-matches date-regex s)
         date (.parse js/Date (str month "/" day "/" year))]
     date))
 
-(defn valid-date-str? [s]
+(defn- valid-date-str? [s]
   (re-matches date-regex s))
 
-(defn valid-departure-date? [d] (valid-date-str? d))
+(defn- valid-departure-date? [d] (valid-date-str? d))
 
-(defn valid-arrival-date? [d a]
+(defn- valid-arrival-date? [d a]
   (and (valid-date-str? a)
        (< (str-to-date d) (str-to-date a))))
 
-(defn update-date [date, input]
+(defn- update-date [date, input]
   (reset! date input))
 
-(defn ready-to-submit? [flight-type departure-date arrival-date]
+(defn- ready-to-submit? [flight-type departure-date arrival-date]
   (not (and
         (valid-departure-date? departure-date)
         (if (= flight-type return-flight)
@@ -49,7 +49,7 @@
 ;; View
 
 ;; -------------------------
-(defn showSuccessMessage [flight-type departure-date arrival-date]
+(defn- showSuccessMessage [flight-type departure-date arrival-date]
   (js/alert (str "You have booked a " flight-type " flight on "
                  (if (= flight-type one-way-flight)
                    departure-date

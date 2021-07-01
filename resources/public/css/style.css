@@ -42,3 +42,22 @@ h2 {
 .invalid-input {
   background-color: rgb(255, 126, 126);
 }
+
+.timer {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border: 2px solid gray;
+  border-radius: 20px;
+  justify-content: space-between;
+  width: 40%;
+  height: 150px;
+  padding: 20px;
+}
+
+.elapsed-time, .duration {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

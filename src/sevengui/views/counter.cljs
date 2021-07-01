@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]))
 
 
-(def click-count (r/atom 0))
+(defonce click-count (r/atom 0))
 
 (defn counter-component []
   [:div {:class "task"}
