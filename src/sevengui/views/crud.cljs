@@ -6,6 +6,14 @@
 
 ;; TODO
 ;; overly complex updating of selection because its not a true computed property or wahtever
+;; I prevent actions from occuring in the view if invalid instead of ALSO checking for invalid-ness in ! actions.
+;;;; is this fine? That's like putting business logic in the view... u wouldn't do this with an API since u dont trust the client
+
+
+;seems very weird i dont use the filtered people list in viewmodel as default.
+
+;; hmmm wouldnt my selection issue be solved if i respected the browser's selection value
+;;; and queried for the element's value instead of manually updating state?... this seems way better.
 
 ;; -------------------------
 ;; Model
@@ -30,14 +38,14 @@
            :selected-id (:id (first initial-people))}))
 
 (defn- valid-name? []
-  (not-empty (:input-name @component-state)))
+  (boolean (not-empty (:input-name @component-state))))
 
 (defn- valid-surname? []
-  (not-empty (:input-surname @component-state)))
+  (boolean (not-empty (:input-surname @component-state))))
 
 (defn- valid-full-name? []
-  (boolean (and (valid-name?)
-                (valid-surname?))))
+  (and (valid-name?)
+       (valid-surname?)))
 
 (defn- person-selected? []
   (boolean (not-empty (:selected-id @component-state))))
@@ -56,11 +64,12 @@
   (filter #(.includes (.toLowerCase (% :surname)) prefix) people))
 
 (defn- find-person
+  "Finds person by id or returns nil"
   [id coll]
   (first (keep-indexed #(when (= (:id %2) id) %1) coll)))
 
 (defn- filtered-people-list []
-  (filter-people (:people @component-state) (:input-prefix @component-state)))
+  (if (= "" (:input-prefix @component-state)) (:people @component-state) (filter-people (:people @component-state) (:input-prefix @component-state))))
 
 (defn- set-selected-person! [id]
   (swap! component-state assoc :selected-id id))
@@ -73,22 +82,25 @@
 (defn- select-first-visible-person! []
   (set-selected-person! (get-first-visible-person)))
 
-(defn- create-person! []
+(defn- create-person!
+  "Creates a person and returns the person's uuid"
+  []
   (let [new-person-uuid (str (random-uuid))
         new-person (generate-person new-person-uuid (:input-name @component-state) (:input-surname @component-state))]
-    (swap! component-state assoc :selected-id new-person-uuid :people (conj (:people @component-state) new-person))))
+    (swap! component-state assoc :people (conj (:people @component-state) new-person))
+    new-person-uuid))
 
 (defn- update-person! []
   (let [selected-person-index (find-person (:selected-id @component-state) (:people @component-state))
         new-person (generate-person (:selected-id @component-state) (:input-name @component-state) (:input-surname @component-state))]
     (swap! component-state assoc-in [:people selected-person-index] new-person)
-    (when (:input-prefix @component-state) (if (find-person (:selected-id @component-state) (filtered-people-list)) nil (select-first-visible-person!)))))
+    (:selected-id @component-state)))
 
 (defn- delete-person! []
   (let [selected-person-index (find-person (:selected-id @component-state) (:people @component-state))
         new-people (remove-from-vec selected-person-index (:people @component-state))]
-    (swap! component-state assoc :people new-people)
-    (select-first-visible-person!)))
+    (swap! component-state assoc :people new-people)))
+
 
 ;; -------------------------
 ;; Controller
@@ -96,9 +108,13 @@
 ;; -------------------------
 (defn- on-person-action! [action]
   (case action
-    "create" (create-person!)
-    "update" (update-person!)
-    "delete" (delete-person!)))
+    "create" (-> (create-person!)
+                 (set-selected-person!))
+    "update" (-> (update-person!)
+                 (find-person (filtered-people-list))
+                 (when-not (select-first-visible-person!)))
+    "delete" ((delete-person!)
+              (select-first-visible-person!))))
 
 (defn- on-input-update! [input-key new-value]
   (swap! component-state assoc input-key new-value))
