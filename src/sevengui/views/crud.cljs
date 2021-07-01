@@ -2,19 +2,6 @@
   (:require [reagent.core :as r]
             [sevengui.util :refer [remove-from-vec]]))
 
-(enable-console-print!)
-
-;; TODO
-;; overly complex updating of selection because its not a true computed property or wahtever
-;; I prevent actions from occuring in the view if invalid instead of ALSO checking for invalid-ness in ! actions.
-;;;; is this fine? That's like putting business logic in the view... u wouldn't do this with an API since u dont trust the client
-
-
-;seems very weird i dont use the filtered people list in viewmodel as default.
-
-;; hmmm wouldnt my selection issue be solved if i respected the browser's selection value
-;;; and queried for the element's value instead of manually updating state?... this seems way better.
-
 ;; -------------------------
 ;; Model
 
@@ -64,41 +51,44 @@
   (filter #(.includes (.toLowerCase (% :surname)) prefix) people))
 
 (defn- find-person
-  "Finds person by id or returns nil"
   [id coll]
   (first (keep-indexed #(when (= (:id %2) id) %1) coll)))
 
 (defn- filtered-people-list []
-  (if (= "" (:input-prefix @component-state)) (:people @component-state) (filter-people (:people @component-state) (:input-prefix @component-state))))
+  (let [{:keys [input-prefix people]} @component-state]
+    (if (= "" input-prefix) people (filter-people people input-prefix))))
 
 (defn- set-selected-person! [id]
   (swap! component-state assoc :selected-id id))
 
 (defn- get-first-visible-person []
-  (cond
-    (:input-prefix @component-state) (or (:id (first (filtered-people-list))) "")
-    :else (if (empty? (:people @component-state)) "" (:id (first (:people @component-state))))))
+  (let [{:keys [input-prefix people]} @component-state]
+    (cond
+      input-prefix (or (:id (first (filtered-people-list)))
+                       "")
+      :else (if (empty? people) "" (:id (first people))))))
 
 (defn- select-first-visible-person! []
   (set-selected-person! (get-first-visible-person)))
 
-(defn- create-person!
-  "Creates a person and returns the person's uuid"
-  []
-  (let [new-person-uuid (str (random-uuid))
-        new-person (generate-person new-person-uuid (:input-name @component-state) (:input-surname @component-state))]
-    (swap! component-state assoc :people (conj (:people @component-state) new-person))
+(defn- create-person! []
+  (let [{:keys [input-name input-surname people]} @component-state
+        new-person-uuid (str (random-uuid))
+        new-person (generate-person new-person-uuid input-name input-surname)]
+    (swap! component-state assoc :people (conj people new-person))
     new-person-uuid))
 
 (defn- update-person! []
-  (let [selected-person-index (find-person (:selected-id @component-state) (:people @component-state))
-        new-person (generate-person (:selected-id @component-state) (:input-name @component-state) (:input-surname @component-state))]
+  (let [{:keys [input-name input-surname selected-id people]} @component-state
+        selected-person-index (find-person selected-id people)
+        new-person (generate-person selected-id input-name input-surname)]
     (swap! component-state assoc-in [:people selected-person-index] new-person)
-    (:selected-id @component-state)))
+    selected-id))
 
 (defn- delete-person! []
-  (let [selected-person-index (find-person (:selected-id @component-state) (:people @component-state))
-        new-people (remove-from-vec selected-person-index (:people @component-state))]
+  (let [{:keys [selected-id people]} @component-state
+        selected-person-index (find-person selected-id people)
+        new-people (remove-from-vec selected-person-index people)]
     (swap! component-state assoc :people new-people)))
 
 
@@ -117,9 +107,10 @@
               (select-first-visible-person!))))
 
 (defn- on-input-update! [input-key new-value]
+  (js/console.log new-value)
   (swap! component-state assoc input-key new-value))
 
-(defn- on-prefix-update [new-value]
+(defn- on-prefix-update! [new-value]
   (on-input-update! :input-prefix new-value)
   (select-first-visible-person!))
 
@@ -130,42 +121,55 @@
 (defn- format-name [name surname]
   (str surname ", " name))
 
-(defn- people-list-component
-  [{:keys [people value on-change]}]
-  [:div.row
-   [:select.field.full-width {:size 3
-                              :value value
-                              :on-change on-change}
-    (for [person people]
-      [:option {:value (:id person)
-                :key (:id person)} (format-name (:name person) (:surname person))])]])
+(defn- people-list
+  [{:keys [items value on-change]}]
+  [:div
+   [:select {:size 3
+             :value value
+             :on-change on-change}
+    (for [item items]
+      [:option {:value (:id item)
+                :key (:id item)} (format-name (:name item)
+                                              (:surname item))])]])
 
 (defn crud-component []
   [:div {:class "task"}
    [:h2 "Task 5: CRUD"]
-   [:div.container
-    [:div
-     [:label "Filter prefix"]
-     [:input {:value (:input-prefix @component-state)
-              :on-change #(on-prefix-update (.. % -target -value))}]]
-    [:div
-     [:div
-      [people-list-component {:value (:selected-id @component-state)
-                              :people (filter-people (:people @component-state) (:input-prefix @component-state))
-                              :on-change #(on-input-update! :selected-id (.. % -target -value))}]]
-     [:div
-      [:label "Name:"]
-      [:input {:class (when (not (valid-name?)) "invalid-input")
-               :value (:input-name @component-state)
-               :on-change #(swap! component-state assoc :input-name (.. % -target -value))}]
-      [:label "Surname:"]
-      [:input {:class (when (not (valid-surname?)) "invalid-input")
-               :value (:input-surname @component-state)
-               :on-change #(swap! component-state assoc :input-surname (.. % -target -value))}]]]
-    [:div
-     [:button {:disabled (not (can-create?))
-               :on-click #(on-person-action! "create")} "Create"]
-     [:button {:disabled (not (can-update?))
-               :on-click #(on-person-action! "update")} "Update"]
-     [:button {:disabled (not (can-delete?))
-               :on-click #(on-person-action! "delete")} "Delete"]]]])
+   (let [{:keys [input-name
+                 input-surname
+                 selected-id
+                 input-prefix
+                 people]} @component-state]
+     [:div.container
+      [:div
+       [:label "Filter prefix"]
+       [:input {:value input-prefix
+                :on-change #(on-prefix-update! (.. % -target -value))}]]
+      [:div
+       [:div
+        [people-list {:value selected-id
+                      :items (filter-people people input-prefix)
+                      :on-change #(on-input-update! :selected-id
+                                                    (.. % -target -value))}]]
+       [:div
+        [:label "Name:"]
+        [:input {:class (when (not (valid-name?)) "invalid-input")
+                 :value input-name
+                 :on-change #(swap! component-state
+                                    assoc
+                                    :input-name
+                                    (.. % -target -value))}]
+        [:label "Surname:"]
+        [:input {:class (when (not (valid-surname?)) "invalid-input")
+                 :value input-surname
+                 :on-change #(swap! component-state
+                                    assoc
+                                    :input-surname
+                                    (.. % -target -value))}]]]
+      [:div
+       [:button {:disabled (not (can-create?))
+                 :on-click #(on-person-action! "create")} "Create"]
+       [:button {:disabled (not (can-update?))
+                 :on-click #(on-person-action! "update")} "Update"]
+       [:button {:disabled (not (can-delete?))
+                 :on-click #(on-person-action! "delete")} "Delete"]]])])
