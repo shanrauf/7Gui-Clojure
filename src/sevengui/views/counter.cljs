@@ -1,7 +1,6 @@
 (ns sevengui.views.counter
   (:require [reagent.core :as r]))
 
-
 (defonce click-count (r/atom 0))
 
 (defn counter-component []
