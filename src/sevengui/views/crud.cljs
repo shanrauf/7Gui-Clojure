@@ -5,21 +5,13 @@
 (enable-console-print!)
 
 ;; TODO
-; edge case of when person vector is empty; then no value on teh select
-; when u filter, u need to select the first element on the list; hmm shouldntu  only be selecting form a fitlerd lsit to begi with?
-
-;; if i have item 1 selected, and i click and drag to item 3 and let go, it goes back to item 1
-
-;; there was a delete bug; i ahd my name left w/ "r" prefix and i pressed delete 2 times and only on the 2nd time it deleted
-;;; check what happens when "r" prefix and u update a selection to no longer match the prefix (so it disapepars); need to re ask for
-;;;; top thing then
-;;;;;; I'm causing a lot of problems cuz of the weird way I compute top visible person. need to do in render i think?
+;; overly complex updating of selection because its not a true computed property or wahtever
 
 ;; -------------------------
 ;; Model
 
 ;; -------------------------
-(defn generate-person [id name surname]
+(defn- generate-person [id name surname]
   {:id (or id (str (random-uuid)))
    :name name
    :surname surname})
@@ -38,17 +30,23 @@
            :selected-id (:id (first initial-people))}))
 
 (defn- valid-name? []
-  (and (seq (:input-name @component-state))
-       (seq (:input-surname @component-state))))
+  (not-empty (:input-name @component-state)))
+
+(defn- valid-surname? []
+  (not-empty (:input-surname @component-state)))
+
+(defn- valid-full-name? []
+  (boolean (and (valid-name?)
+                (valid-surname?))))
 
 (defn- person-selected? []
-  (seq (:selected-id @component-state)))
+  (boolean (not-empty (:selected-id @component-state))))
 
 (defn- can-create? []
-  (valid-name?))
+  (valid-full-name?))
 
 (defn- can-update? []
-  (and (person-selected?) (valid-name?)))
+  (and (person-selected?) (valid-full-name?)))
 
 (defn- can-delete? []
   (person-selected?))
@@ -57,7 +55,7 @@
   [people prefix]
   (filter #(.includes (.toLowerCase (% :surname)) prefix) people))
 
-(defn find-person
+(defn- find-person
   [id coll]
   (first (keep-indexed #(when (= (:id %2) id) %1) coll)))
 
@@ -81,10 +79,10 @@
     (swap! component-state assoc :selected-id new-person-uuid :people (conj (:people @component-state) new-person))))
 
 (defn- update-person! []
-  (let [selected-person-index (find-person (:selected-id @component-state) (:people @component-state))]
-    (swap! component-state assoc-in [:people selected-person-index]
-           (generate-person (:selected-id @component-state) (:input-name @component-state) (:input-surname @component-state)))
-    (select-first-visible-person!)))
+  (let [selected-person-index (find-person (:selected-id @component-state) (:people @component-state))
+        new-person (generate-person (:selected-id @component-state) (:input-name @component-state) (:input-surname @component-state))]
+    (swap! component-state assoc-in [:people selected-person-index] new-person)
+    (when (:input-prefix @component-state) (if (find-person (:selected-id @component-state) (filtered-people-list)) nil (select-first-visible-person!)))))
 
 (defn- delete-person! []
   (let [selected-person-index (find-person (:selected-id @component-state) (:people @component-state))
@@ -108,7 +106,6 @@
 (defn- on-prefix-update [new-value]
   (on-input-update! :input-prefix new-value)
   (select-first-visible-person!))
-
 
 ;; -------------------------
 ;; View
@@ -142,10 +139,12 @@
                               :on-change #(on-input-update! :selected-id (.. % -target -value))}]]
      [:div
       [:label "Name:"]
-      [:input {:value (:input-name @component-state)
+      [:input {:class (when (not (valid-name?)) "invalid-input")
+               :value (:input-name @component-state)
                :on-change #(swap! component-state assoc :input-name (.. % -target -value))}]
       [:label "Surname:"]
-      [:input {:value (:input-surname @component-state)
+      [:input {:class (when (not (valid-surname?)) "invalid-input")
+               :value (:input-surname @component-state)
                :on-change #(swap! component-state assoc :input-surname (.. % -target -value))}]]]
     [:div
      [:button {:disabled (not (can-create?))
