@@ -58,7 +58,7 @@
 (defn flight-booker-component []
   [:div {:class "task"}
    [:h2 "Task 3: Flight Booker"]
-   [:form {:class "flight-form"}
+   [:form.container
     [:select {:type "select"
               :on-change #(reset! flight-type (.. % -target -value))}
      [:option {:value one-way-flight} "One-way flight"]

@@ -49,7 +49,7 @@
   [:div {:class "task"}
    [:h2 "Task 2: Temperature Converter"]
    (let [{:keys [fahrenheit celsius]} @temperatures]
-     [:div {:class "temperature-converter"}
+     [:div.container
       [:div {:class "temperature"}
        [:label "Celsius"]
        [temperature-input-component :celsius :fahrenheit (format-temperature celsius)]]

@@ -38,7 +38,6 @@
 
 ;; -------------------------
 (defn- format-elapsed-time
-  "Returns a string represinting the seconds as a float"
   [seconds]
   (-> seconds
       (/ 1)
@@ -51,7 +50,7 @@
   (r/with-let [timer (start-timer)]
     [:div {:class "task"}
      [:h2 "Task 4: Timer"]
-     [:div {:class "timer"}
+     [:div.container
       [:div {:class "elapsed-time"}
        [:label "Elapsed time:"]
        [:meter {:value (:elapsed-time @timer-state)
