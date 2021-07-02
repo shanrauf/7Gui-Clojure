@@ -3,9 +3,9 @@
 
   :url "https://github.com/shanrauf"
 
-  :dependencies [[org.clojure/clojure "1.9.0"]
-                 [org.clojure/clojurescript "1.10.312"]
-                 [reagent "0.10.0"]]
+  :dependencies [[org.clojure/clojure "1.10.3"]
+                 [org.clojure/clojurescript "1.10.866"]
+                 [reagent "1.0.0"]]
 
   :resource-paths ["resources" "target"]
 
