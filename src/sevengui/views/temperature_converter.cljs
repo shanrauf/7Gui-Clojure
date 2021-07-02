@@ -40,7 +40,8 @@
   (if (string? temp) temp (str (Math/round (float temp)))))
 
 (defn- temperature-input-component [updated-temp invalidated-temp val]
-  [:input {:value val
+  [:input {:class (when (and (not-empty val) (js/isNaN val)) "invalid-input")
+           :value val
            :on-change #(update-temperatures updated-temp
                                             invalidated-temp
                                             (.. % -target -value))}])
@@ -49,9 +50,9 @@
    [:h2 "Task 2: Temperature Converter"]
    (let [{:keys [fahrenheit celsius]} @temperatures]
      [:div.container
-      [:div {:class "temperature"}
-       [:label "Celsius"]
+      [:div {:class "input-container"}
+       [:label "Celsius:"]
        [temperature-input-component :celsius :fahrenheit (format-temperature celsius)]]
-      [:div {:class "temperature"}
-       [:label "Fahrenheit"]
+      [:div {:class "input-container"}
+       [:label "Fahrenheit:"]
        [temperature-input-component :fahrenheit :celsius (format-temperature fahrenheit)]]])])

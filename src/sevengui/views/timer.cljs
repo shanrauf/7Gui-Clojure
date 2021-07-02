@@ -53,7 +53,7 @@
    {:component-did-mount #(start-timer)
     :reagent-render
     (fn []
-      [:div {:class "task"}
+      [:div.task.timer
        [:h2 "Task 4: Timer"]
        [:div.container
         [:div {:class "elapsed-time"}
@@ -61,7 +61,7 @@
          [:meter {:value (:elapsed-time @timer-state)
                   :max (:duration @timer-state)}]
          [:p (format-elapsed-time (:elapsed-time @timer-state))]]
-        [:div {:class "duration"}
+        [:div {:class "input-container"}
          [:label "Duration"]
          [:input {:type "range"
                   :value (:duration @timer-state)

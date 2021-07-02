@@ -66,25 +66,31 @@
 
 
 (defn flight-booker-component []
-  [:div {:class "task"}
+  [:div.task.flight-booker
    [:h2 "Task 3: Flight Booker"]
    [:form.container
-    [:select {:type "select"
-              :on-change #(reset! flight-type (.. % -target -value))}
-     [:option {:value one-way-flight} "One-way flight"]
-     [:option {:value return-flight} "Return flight"]]
-    [:input {:class (when (not (valid-departure-date? @departure-date)) "invalid-input")
-             :value @departure-date
-             :placeholder "Departure flight date (e.g. 27.03.2014)"
-             :on-change #(update-date departure-date
-                                      (.. % -target -value))}]
-    [:input {:class (when (and (= @flight-type return-flight)
-                               (not (valid-arrival-date? @departure-date @arrival-date))) "invalid-input")
-             :value @arrival-date
-             :disabled (= @flight-type one-way-flight)
-             :placeholder "Arrival flight date (e.g. 28.03.2014)"
-             :on-change #(update-date arrival-date
-                                      (.. % -target -value))}]
+    [:div.custom-select
+     [:select {:type "select"
+               :on-change #(reset! flight-type (.. % -target -value))}
+      [:option {:value one-way-flight} "One-way flight"]
+      [:option {:value return-flight} "Return flight"]]]
+    [:div.input-container
+     [:label "Departure Date:"]
+     [:input {:class (when (not (valid-departure-date? @departure-date)) "invalid-input")
+              :value @departure-date
+              :placeholder "(e.g. 27.03.2014)"
+              :on-change #(update-date departure-date
+                                       (.. % -target -value))}]]
+    [:div.input-container
+     [:label "Arrival Date:"]
+     [:input {:class (when (and (= @flight-type return-flight)
+                                (not (valid-arrival-date? @departure-date
+                                                          @arrival-date))) "invalid-input")
+              :value @arrival-date
+              :disabled (= @flight-type one-way-flight)
+              :placeholder "(e.g. 28.03.2014)"
+              :on-change #(update-date arrival-date
+                                       (.. % -target -value))}]]
     [:button {:type "button"
               :disabled (ready-to-submit?)
               :on-click #(on-submit %)} "Book"]]])

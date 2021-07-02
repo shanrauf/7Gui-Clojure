@@ -80,7 +80,7 @@
 (defn circle-drawer-component []
   [:div {:class "task"}
    [:h2 "Task 6: Circle Drawer"]
-   [:div
+   [:div.container
     [:button {:type "button"
               :on-click #(on-undo!)} "Undo"]
     [:button {:type "button"

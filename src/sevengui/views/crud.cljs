@@ -125,14 +125,14 @@
 
 (defn- people-list
   [{:keys [items value on-change]}] ;; TODO this seems strange... how does it work w/o a "let"?
-  [:div
-   [:select {:size 3
-             :value value
-             :on-change on-change}
-    (for [item items]
-      [:option {:value (:id item)
-                :key (:id item)} (format-name (:name item)
-                                              (:surname item))])]])
+  [:select {:class "people-list"
+            :size 3
+            :value value
+            :on-change on-change}
+   (for [item items]
+     [:option {:value (:id item)
+               :key (:id item)} (format-name (:name item)
+                                             (:surname item))])])
 
 (defn crud-component []
   [:div {:class "task"}
@@ -143,7 +143,7 @@
                  input-prefix
                  people]} @component-state]
      [:div.container
-      [:div
+      [:div.input-container
        [:label "Filter prefix"]
        [:input {:value input-prefix
                 :on-change #(on-prefix-update! (.. % -target -value))}]]
@@ -153,14 +153,15 @@
                       :items (filter-people people input-prefix)
                       :on-change #(on-input-update! :selected-id
                                                     (.. % -target -value))}]]
-       [:div
+       [:div.input-container
         [:label "Name:"]
         [:input {:class (when (not (valid-name?)) "invalid-input")
                  :value input-name
                  :on-change #(swap! component-state
                                     assoc
                                     :input-name
-                                    (.. % -target -value))}]
+                                    (.. % -target -value))}]]
+       [:div.input-container
         [:label "Surname:"]
         [:input {:class (when (not (valid-surname?)) "invalid-input")
                  :value input-surname
@@ -168,7 +169,7 @@
                                     assoc
                                     :input-surname
                                     (.. % -target -value))}]]]
-      [:div
+      [:div.buttons
        [:button {:disabled (not (can-create?))
                  :on-click #(on-person-action! "create")} "Create"]
        [:button {:disabled (not (can-update?))

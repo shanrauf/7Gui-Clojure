@@ -12,13 +12,14 @@
    [sevengui.views.cells :as cells]))
 
 (defn seven-gui-roam []
-  [:div
+  [:div.seven-gui-roam
    [:h1 "7GUI Clojure Implementation"]
-   [counter/counter-component]
-   [temperature-converter/temperature-converter-component]
-   [flight-booker/flight-booker-component]
-   [timer/timer-component]
-   [crud/crud-component]
-   [circle-drawer/circle-drawer-component]
-   [cells/cells-component]])
+   [:div.tasks
+    [counter/counter-component]
+    [temperature-converter/temperature-converter-component]
+    [flight-booker/flight-booker-component]
+    [timer/timer-component]
+    [crud/crud-component]
+    [circle-drawer/circle-drawer-component]
+    [cells/cells-component]]])
 (d/render [seven-gui-roam] (.getElementById js/document "app"))
