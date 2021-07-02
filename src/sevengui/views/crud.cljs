@@ -124,7 +124,7 @@
   (str surname ", " name))
 
 (defn- people-list
-  [{:keys [items value on-change]}]
+  [{:keys [items value on-change]}] ;; TODO this seems strange... how does it work w/o a "let"?
   [:div
    [:select {:size 3
              :value value
