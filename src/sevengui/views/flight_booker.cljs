@@ -38,22 +38,32 @@
 (defn- update-date [date, input]
   (reset! date input))
 
-(defn- ready-to-submit? [flight-type departure-date arrival-date]
+(defn- ready-to-submit? []
   (not (and
-        (valid-departure-date? departure-date)
-        (if (= flight-type return-flight)
-          (valid-arrival-date? departure-date arrival-date)
+        (valid-departure-date? @departure-date)
+        (if (= @flight-type @return-flight)
+          (valid-arrival-date? @departure-date @arrival-date)
           true))))
+
+;; -------------------------
+;; Controllers
+
+;; -------------------------
+(defn on-submit [e]
+  (.preventDefault e)
+  (let [success-message (str "You have booked a "
+                             flight-type
+                             " flight on "
+                             (if (= flight-type one-way-flight)
+                               departure-date
+                               arrival-date))]
+    (js/alert success-message)))
 
 ;; -------------------------
 ;; View
 
 ;; -------------------------
-(defn- showSuccessMessage [flight-type departure-date arrival-date]
-  (js/alert (str "You have booked a " flight-type " flight on "
-                 (if (= flight-type one-way-flight)
-                   departure-date
-                   arrival-date))))
+
 
 (defn flight-booker-component []
   [:div {:class "task"}
@@ -75,10 +85,6 @@
              :placeholder "Arrival flight date (e.g. 28.03.2014)"
              :on-change #(update-date arrival-date
                                       (.. % -target -value))}]
-    [:button {:type "buton"
-              :disabled (ready-to-submit? @flight-type @departure-date @arrival-date)
-              :on-click (fn [e]
-                          (.preventDefault e)
-                          (showSuccessMessage @flight-type
-                                              @departure-date
-                                              @arrival-date))} "Book"]]])
+    [:button {:type "button"
+              :disabled (ready-to-submit?)
+              :on-click #(on-submit %)} "Book"]]])

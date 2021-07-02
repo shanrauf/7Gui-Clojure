@@ -58,9 +58,6 @@
   (let [{:keys [input-prefix people]} @component-state]
     (if (= "" input-prefix) people (filter-people people input-prefix))))
 
-(defn- set-selected-person! [id]
-  (swap! component-state assoc :selected-id id))
-
 (defn- get-first-visible-person []
   (let [{:keys [input-prefix people]} @component-state]
     (cond
@@ -68,9 +65,10 @@
                        "")
       :else (if (empty? people) "" (:id (first people))))))
 
-(defn- select-first-visible-person! []
-  (set-selected-person! (get-first-visible-person)))
+;; -------------------------
+;; CRUD
 
+;; -------------------------
 (defn- create-person! []
   (let [{:keys [input-name input-surname people]} @component-state
         new-person-uuid (str (random-uuid))
@@ -91,6 +89,11 @@
         new-people (remove-from-vec selected-person-index people)]
     (swap! component-state assoc :people new-people)))
 
+(defn- set-selected-person! [id]
+  (swap! component-state assoc :selected-id id))
+
+(defn- select-first-visible-person! []
+  (set-selected-person! (get-first-visible-person)))
 
 ;; -------------------------
 ;; Controller
@@ -107,7 +110,6 @@
               (select-first-visible-person!))))
 
 (defn- on-input-update! [input-key new-value]
-  (js/console.log new-value)
   (swap! component-state assoc input-key new-value))
 
 (defn- on-prefix-update! [new-value]
