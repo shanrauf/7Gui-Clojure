@@ -29,8 +29,8 @@
                    assoc
                    modified-temp new_value
                    invalidated-temp (if (= modified-temp :fahrenheit)
-                                      (c->f new_value)
-                                      (f->c new_value))))))
+                                      (f->c new_value)
+                                      (c->f new_value))))))
 
 ;; -------------------------
 ;; View
@@ -45,7 +45,7 @@
                                             invalidated-temp
                                             (.. % -target -value))}])
 (defn temperature-converter-component []
-  [:div {:class "task"}
+  [:div.task.temperature-converter
    [:h2 "Task 2: Temperature Converter"]
    (let [{:keys [fahrenheit celsius]} @temperatures]
      [:div.container
