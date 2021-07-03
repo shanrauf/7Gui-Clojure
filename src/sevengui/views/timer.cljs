@@ -69,7 +69,7 @@
                   :max 100
                   :on-change #(update-duration! timer-state
                                                 (.. % -target -value))}]]
-        [:button {:type "button"
-                  :on-click #(swap! timer-state
-                                    assoc
-                                    :elapsed-time 0)} "Reset"]]])}))
+        [:button.custom-button {:type "button"
+                                :on-click #(swap! timer-state
+                                                  assoc
+                                                  :elapsed-time 0)} "Reset"]]])}))

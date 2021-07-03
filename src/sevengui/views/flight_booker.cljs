@@ -68,7 +68,7 @@
 (defn flight-booker-component []
   [:div.task.flight-booker
    [:h2 "Task 3: Flight Booker"]
-   [:form.container
+   [:form.custom-form
     [:div.custom-select
      [:select {:type "select"
                :on-change #(reset! flight-type (.. % -target -value))}
@@ -91,6 +91,6 @@
               :placeholder "(e.g. 28.03.2014)"
               :on-change #(update-date arrival-date
                                        (.. % -target -value))}]]
-    [:button {:type "button"
-              :disabled (ready-to-submit?)
-              :on-click #(on-submit %)} "Book"]]])
+    [:button.custom-button {:type "button"
+                            :disabled (ready-to-submit?)
+                            :on-click #(on-submit %)} "Book"]]])

@@ -10,4 +10,4 @@
     [:div.input-container
      [:input {:disabled true
               :value (str @click-count)}]
-     [:button {:on-click #(swap! click-count inc)} "Count"]]]])
+     [:button.custom-button {:on-click #(swap! click-count inc)} "Count"]]]])

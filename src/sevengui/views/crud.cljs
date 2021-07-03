@@ -1,6 +1,5 @@
 (ns sevengui.views.crud
-  (:require [reagent.core :as r]
-            [sevengui.util :refer [remove-from-vec]]))
+  (:require [reagent.core :as r]))
 
 ;; -------------------------
 ;; Model
@@ -34,25 +33,29 @@
   (and (valid-name?)
        (valid-surname?)))
 
-(defn- person-selected? []
+(defn- someone-selected? []
   (boolean (not-empty (:selected-id @component-state))))
+
+(defn- person-selected? [p]
+  (= (:id p) (:selected-id @component-state)))
 
 (defn- can-create? []
   (valid-full-name?))
 
 (defn- can-update? []
-  (and (person-selected?) (valid-full-name?)))
+  (and (someone-selected?) (valid-full-name?)))
 
 (defn- can-delete? []
-  (person-selected?))
+  (someone-selected?))
 
 (defn- filter-people
   [people prefix]
   (filter #(.includes (.toLowerCase (% :surname)) prefix) people))
 
 (defn- find-person
-  [id coll]
-  (first (keep-indexed #(when (= (:id %2) id) %1) coll)))
+  [id people]
+  (js/console.log (first (keep-indexed #(when (= (:id %2) id) %1) people)))
+  (first (keep-indexed #(when (= (:id %2) id) %1) people)))
 
 (defn- filtered-people-list []
   (let [{:keys [input-prefix people]} @component-state]
@@ -78,16 +81,15 @@
 
 (defn- update-person! []
   (let [{:keys [input-name input-surname selected-id people]} @component-state
-        selected-person-index (find-person selected-id people)
         new-person (generate-person selected-id input-name input-surname)]
-    (swap! component-state assoc-in [:people selected-person-index] new-person)
+    (swap! component-state assoc :people (vec (map #(if (person-selected? %)
+                                                      new-person
+                                                      %) people)))
     selected-id))
 
 (defn- delete-person! []
-  (let [{:keys [selected-id people]} @component-state
-        selected-person-index (find-person selected-id people)
-        new-people (remove-from-vec selected-person-index people)]
-    (swap! component-state assoc :people new-people)))
+  (swap! component-state assoc :people (filterv #(not (person-selected? %))
+                                                (:people @component-state))))
 
 (defn- set-selected-person! [id]
   (swap! component-state assoc :selected-id id))
@@ -123,11 +125,9 @@
 (defn- format-name [name surname]
   (str surname ", " name))
 
-(defn- people-list
-  [{:keys [items value on-change]}] ;; TODO this seems strange... how does it work w/o a "let"?
+(defn- people-list [{:keys [items on-change]}]
   [:select {:class "people-list"
             :size 3
-            :value value
             :on-change on-change}
    (for [item items]
      [:option {:value (:id item)
@@ -139,7 +139,6 @@
    [:h2 "Task 5: CRUD"]
    (let [{:keys [input-name
                  input-surname
-                 selected-id
                  input-prefix
                  people]} @component-state]
      [:div.container
@@ -148,31 +147,29 @@
        [:input {:value input-prefix
                 :on-change #(on-prefix-update! (.. % -target -value))}]]
       [:div
-       [:div
-        [people-list {:value selected-id
-                      :items (filter-people people input-prefix)
-                      :on-change #(on-input-update! :selected-id
-                                                    (.. % -target -value))}]]
-       [:div.input-container
-        [:label "Name:"]
-        [:input {:class (when (not (valid-name?)) "invalid-input")
-                 :value input-name
-                 :on-change #(swap! component-state
-                                    assoc
-                                    :input-name
-                                    (.. % -target -value))}]]
-       [:div.input-container
-        [:label "Surname:"]
-        [:input {:class (when (not (valid-surname?)) "invalid-input")
-                 :value input-surname
-                 :on-change #(swap! component-state
-                                    assoc
-                                    :input-surname
-                                    (.. % -target -value))}]]]
+       [people-list {:items (filter-people people input-prefix)
+                     :on-change #(on-input-update! :selected-id
+                                                   (.. % -target -value))}]]
+      [:div.input-container
+       [:label "Name:"]
+       [:input {:class (when (not (valid-name?)) "invalid-input")
+                :value input-name
+                :on-change #(swap! component-state
+                                   assoc
+                                   :input-name
+                                   (.. % -target -value))}]]
+      [:div.input-container
+       [:label "Surname:"]
+       [:input {:class (when (not (valid-surname?)) "invalid-input")
+                :value input-surname
+                :on-change #(swap! component-state
+                                   assoc
+                                   :input-surname
+                                   (.. % -target -value))}]]
       [:div.buttons
-       [:button {:disabled (not (can-create?))
-                 :on-click #(on-person-action! "create")} "Create"]
-       [:button {:disabled (not (can-update?))
-                 :on-click #(on-person-action! "update")} "Update"]
-       [:button {:disabled (not (can-delete?))
-                 :on-click #(on-person-action! "delete")} "Delete"]]])])
+       [:button.custom-button {:disabled (not (can-create?))
+                               :on-click #(on-person-action! "create")} "Create"]
+       [:button.custom-button {:disabled (not (can-update?))
+                               :on-click #(on-person-action! "update")} "Update"]
+       [:button.custom-button {:disabled (not (can-delete?))
+                               :on-click #(on-person-action! "delete")} "Delete"]]])])
