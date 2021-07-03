@@ -3,7 +3,6 @@
 
 ; TODO
 ;; fix undo/redo vec->seq, refactor
-;;; how do i manage how the actions of creating/updating circles should trigger an action of updating undo/redo stacks?
 
 ;; bug when a circle increases diameter and overlaps another
 ;;; sometimes the smaller circle is visible
@@ -28,8 +27,8 @@
 (defonce canvas-state
   (r/atom {:circles []
            :selected-circle nil
-           :undo-stack nil
-           :redo-stack nil
+           :undo-stack []
+           :redo-stack []
            :popup-active false
            :slider-active false}))
 
@@ -60,25 +59,25 @@
 ;; -------------------------
 (defn undo!
   []
-  (let [s @canvas-state]
+  (let [{:keys [undo-stack redo-stack circles]} @canvas-state]
     (when (can-undo?)
       (swap! canvas-state assoc
              :popup-active false
              :selected-circle nil
-             :circles (first (:undo-stack s))
-             :undo-stack (rest (:undo-stack s))
-             :redo-stack (conj (:redo-stack s) (:circles s))))))
+             :circles (last undo-stack)
+             :undo-stack (pop undo-stack)
+             :redo-stack (conj redo-stack circles)))))
 
 (defn redo!
   []
-  (let [s @canvas-state]
+  (let [{:keys [undo-stack redo-stack circles]} @canvas-state]
     (when (can-redo?)
       (swap! canvas-state assoc
              :popup-active false
              :selected-circle nil
-             :circles (first (:redo-stack s))
-             :redo-stack (rest (:redo-stack s))
-             :undo-stack (conj (:undo-stack s) (:circles s))))))
+             :circles (last redo-stack)
+             :redo-stack (pop redo-stack)
+             :undo-stack (conj undo-stack circles)))))
 
 (defn- set-undo-stack! [s]
   (swap! canvas-state assoc :undo-stack s))
@@ -132,18 +131,18 @@
   (let [{:keys [circles undo-stack]} @canvas-state
         new-circle (generate-circle nil (first coords) (last coords) default-radius)]
     (swap! canvas-state assoc
-           :redo-stack nil
            :popup-active false
            :circles (conj circles new-circle)
-           :undo-stack (conj undo-stack circles))
-    new-circle))
+    (set-undo-stack! (conj undo-stack circles))
+    (set-redo-stack! [])
+    new-circle)))
 
 (defn- commit-circle-diameter! []
   (let [{:keys [selected-circle circles undo-stack]} @canvas-state]
     (swap! canvas-state assoc :circles (map #(if (and (= (:id %) (:id selected-circle))
                                                       (not= (:r %) (:r selected-circle))) selected-circle %) circles))
     (set-undo-stack! (conj undo-stack circles))
-    (set-redo-stack! nil)))
+    (set-redo-stack! [])))
 
 (defn- set-selected-circle! [c]
   (when (not= c (:selected-circle @canvas-state))
