@@ -33,11 +33,11 @@
 (defn- slider-active? []
   (:slider-active @canvas-state))
 
-(defn can-undo?
+(defn- can-undo?
   []
   (seq (:undo-stack @canvas-state)))
 
-(defn can-redo?
+(defn- can-redo?
   []
   (seq (:redo-stack @canvas-state)))
 
@@ -45,7 +45,7 @@
 ;; Canvas History
 
 ;; -------------------------
-(defn undo!
+(defn- undo!
   []
   (let [{:keys [undo-stack redo-stack circles]} @canvas-state]
     (when (can-undo?)
@@ -56,7 +56,7 @@
              :undo-stack (pop undo-stack)
              :redo-stack (conj redo-stack circles)))))
 
-(defn redo!
+(defn- redo!
   []
   (let [{:keys [undo-stack redo-stack circles]} @canvas-state]
     (when (can-redo?)
@@ -83,7 +83,7 @@
 (defn- r->d [r]
   (* r 2))
 
-(defn distance-between [x1 y1 x2 y2]
+(defn- distance-between [x1 y1 x2 y2]
   (Math/sqrt (+ (Math/pow (- y2 y1) 2)
                 (Math/pow (- x2 x1) 2))))
 
@@ -117,14 +117,14 @@
         (and (number? r) (> r 0)) r
         :else (throw (js/Error. "Radius must be a number > 0")))})
 
-(defn get-dom-event-coords [e]
+(defn- get-dom-event-coords [e]
   (let [t (.-currentTarget e)
         rect (.getBoundingClientRect t)
         x (- (.-clientX e) (-> rect .-left int))
         y (- (.-clientY e) (-> rect .-top int))]
     (list x y)))
 
-(defn create-circle!
+(defn- create-circle!
   [coords]
   (let [{:keys [circles undo-stack]} @canvas-state
         new-circle (generate-circle nil (first coords) (last coords) default-radius)]
@@ -166,7 +166,7 @@
 ;; Controllers
 
 ;; -------------------------
-(defn on-canvas-left-click! [e]
+(defn- on-canvas-left-click! [e]
   (-> (get-dom-event-coords e)
       (create-circle!)
       (set-selected-circle!)))
@@ -192,10 +192,10 @@
   (set-slider! false)
   (set-popup! false))
 
-(defn on-undo! []
+(defn- on-undo! []
   (undo!))
 
-(defn on-redo! []
+(defn- on-redo! []
   (redo!))
 
 ;; -------------------------

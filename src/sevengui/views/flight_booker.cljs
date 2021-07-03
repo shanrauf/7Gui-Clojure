@@ -41,7 +41,7 @@
 (defn- ready-to-submit? []
   (not (and
         (valid-departure-date? @departure-date)
-        (if (= @flight-type @return-flight)
+        (if (= @flight-type return-flight)
           (valid-arrival-date? @departure-date @arrival-date)
           true))))
 
@@ -49,14 +49,14 @@
 ;; Controllers
 
 ;; -------------------------
-(defn on-submit [e]
+(defn- on-submit [e]
   (.preventDefault e)
   (let [success-message (str "You have booked a "
-                             flight-type
+                             @flight-type
                              " flight on "
-                             (if (= flight-type one-way-flight)
-                               departure-date
-                               arrival-date))]
+                             (if (= @flight-type one-way-flight)
+                               @departure-date
+                               @arrival-date))]
     (js/alert success-message)))
 
 ;; -------------------------

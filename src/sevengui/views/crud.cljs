@@ -31,6 +31,7 @@
            :input-prefix ""
            :selected-id (:id (first initial-people))}))
 
+;; Computed properties
 (defn- valid-name? []
   (boolean (not-empty (:input-name @component-state))))
 
@@ -56,6 +57,10 @@
 (defn- can-delete? []
   (someone-selected?))
 
+;; -------------------------
+;; People
+
+;; -------------------------
 (defn- filter-people
   [people prefix]
   (filter #(.includes (.toLowerCase (% :surname)) prefix) people))
@@ -66,7 +71,9 @@
 
 (defn- filtered-people-list []
   (let [{:keys [input-prefix people]} @component-state]
-    (if (= "" input-prefix) people (filter-people people input-prefix))))
+    (if (= "" input-prefix)
+      people
+      (filter-people people input-prefix))))
 
 (defn- get-first-visible-person []
   (let [{:keys [input-prefix people]} @component-state]
