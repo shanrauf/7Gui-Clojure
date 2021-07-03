@@ -199,7 +199,6 @@ select {
   }
 }
 
-
 /* Scrollbar */
 .people-list::-webkit-scrollbar-track
 {
@@ -235,12 +234,12 @@ select {
   height: 100%;
   cursor: crosshair;
   background: #d3d9e0;
-  /* height: calc(var(--sizes-leva__rootWidth) / 1.5); */
   position: relative;
 }
 
 .canvas-container circle {
-  stroke: lightgray;
+  stroke: #27ddb6;
+  fill: #0000;
   z-index: 99;
 }
 

@@ -1,18 +1,6 @@
 (ns sevengui.views.circle-drawer
-  (:require [reagent.core :as r]))
-
-; TODO
-;; fix undo/redo vec->seq, refactor
-
-;; bug when a circle increases diameter and overlaps another
-;;; sometimes the smaller circle is visible
-;;;; i dont hve a mechanism to control lvl of visibility; maybe i should not fil in the circles black
-;;; sometimes a smaller circle is under a big one and when u hover to the center of the smaller circle (which u cant see0),
-;;;;;the big circle is unselected and it looks like ur selecting nothing
-
-; should you use keep-indexed or map/filter??
-
-;; CRUD methods should validate data b4 committing (validation logic in sep functions)
+  (:require [reagent.core :as r]
+            [sevengui.util :refer [uuid-str?]]))
 
 ;; -------------------------
 ;; Constants
@@ -114,10 +102,20 @@
    :c))
 
 (defn- generate-circle [id x y r]
-  {:id (or id (str (random-uuid)))
-   :x x
-   :y y
-   :r (or r default-radius)})
+  {:id (cond
+         (and (string? id) (uuid-str? id)) id
+         (nil? id) (str (random-uuid))
+         :else (throw (js/Error. "Id must be a UUID string")))
+   :x (if (js/isNaN x)
+        (throw (js/Error. "X coordinate must be a number"))
+        x)
+   :y (if (js/isNaN y)
+        (throw (js/Error. "Y coordinate must be a number"))
+        y)
+   :r (cond
+        (nil? r) default-radius
+        (and (number? r) (> r 0)) r
+        :else (throw (js/Error. "Radius must be a number > 0")))})
 
 (defn get-dom-event-coords [e]
   (let [t (.-currentTarget e)

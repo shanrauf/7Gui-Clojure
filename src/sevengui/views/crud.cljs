@@ -1,14 +1,22 @@
 (ns sevengui.views.crud
-  (:require [reagent.core :as r]))
+  (:require [reagent.core :as r]
+            [sevengui.util :refer [uuid-str?]]))
 
 ;; -------------------------
 ;; Model
 
 ;; -------------------------
 (defn- generate-person [id name surname]
-  {:id (or id (str (random-uuid)))
-   :name name
-   :surname surname})
+  {:id (cond
+         (and (string? id) (uuid-str? id)) id
+         (nil? id) (str (random-uuid))
+         :else (throw (js/Error. "Id must be a UUID string")))
+   :name (if (and (string? name) (not= "" name) (<= (count name) 100))
+           name
+           (throw (js/Error. "Name must be a non-empty string <= 100 characters")))
+   :surname (if (and (string? surname) (not= "" surname) (<= (count surname) 100))
+              name
+              (throw (js/Error. "Surname must be a non-empty string <= 100 characters")))})
 
 (defonce initial-people
   [(generate-person nil "Conor" "White-Sullivan")
@@ -54,7 +62,6 @@
 
 (defn- find-person
   [id people]
-  (js/console.log (first (keep-indexed #(when (= (:id %2) id) %1) people)))
   (first (keep-indexed #(when (= (:id %2) id) %1) people)))
 
 (defn- filtered-people-list []
