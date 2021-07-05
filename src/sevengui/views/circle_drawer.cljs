@@ -101,10 +101,10 @@
     (fn [prev c]
       (let [{:keys [x y r]} c
             distance-from-circle (distance-between x0 y0 x y)
-            within-circle? (< distance-from-circle r)
-            closer-circle? (< distance-from-circle (:d prev))]
-        (if (and within-circle?
-                 closer-circle?)
+            mouse-within-circle (< distance-from-circle r)
+            closer-circle (< distance-from-circle (:d prev))]
+        (if (and mouse-within-circle
+                 closer-circle)
           {:d distance-from-circle :c c}
           prev)))
     {:d ##Inf :c nil}
@@ -133,19 +133,27 @@
         y (- (.-clientY e) (-> rect .-top int))]
     (list x y)))
 
+(defn- set-circles! [circles]
+  (swap! canvas-state assoc :circles circles))
+
 (defn- create-circle!
-  [coords]
+  [[x y]]
   (let [{:keys [circles undo-stack]} @canvas-state
-        new-circle (generate-circle nil (first coords) (last coords) default-radius)]
-    (swap! canvas-state assoc :circles (conj circles new-circle))
+        new-circle (generate-circle nil x y default-radius)]
+    (set-circles! (conj circles new-circle))
     (set-undo-stack! (conj undo-stack circles))
     (set-redo-stack! [])
     new-circle))
 
+
+(defn- adjust-diameter? [c1 c2]
+  (and (same-circles? c1 c2)
+       (not (equivalent-circles? c1 c2))))
+
 (defn- commit-circle-diameter! []
   (let [{:keys [selected-circle circles undo-stack]} @canvas-state]
-    (swap! canvas-state assoc :circles (map #(if (and (same-circles? % selected-circle)
-                                                      (not (equivalent-circles? % selected-circle))) selected-circle %) circles))
+    (set-circles! (map #(if (adjust-diameter? % selected-circle)
+                          selected-circle %) circles))
     (set-undo-stack! (conj undo-stack circles))
     (set-redo-stack! [])))
 
@@ -222,7 +230,8 @@
                  :on-change #(on-change-diameter! (.. % -target -value))}]]
        [:button.custom-button {:type "button"
                                :auto-focus true ; makes on-blur event fire
-                               :on-click #(set-slider! true)} "Adjust Diameter..."])]))
+                               :on-click #(set-slider! true)}
+        "Adjust Diameter..."])]))
 
 (defn- circle [c]
   (let [{:keys [id x y r]} c
