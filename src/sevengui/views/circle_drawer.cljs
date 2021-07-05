@@ -7,6 +7,7 @@
 
 ;; -------------------------
 (defonce default-radius 10)
+(defonce minimum-radius 5)
 
 ;; -------------------------
 ;; Model
@@ -130,10 +131,10 @@
         new-circle (generate-circle nil (first coords) (last coords) default-radius)]
     (swap! canvas-state assoc
            :popup-active false
-           :circles (conj circles new-circle)
+           :circles (conj circles new-circle))
     (set-undo-stack! (conj undo-stack circles))
     (set-redo-stack! [])
-    new-circle)))
+    new-circle))
 
 (defn- commit-circle-diameter! []
   (let [{:keys [selected-circle circles undo-stack]} @canvas-state]
@@ -156,11 +157,11 @@
 ;; Popup
 
 ;; -------------------------
-(defn- set-popup! [visible]
-  (swap! canvas-state assoc :popup-active visible))
+(defn- set-popup! [is-visible]
+  (swap! canvas-state assoc :popup-active is-visible))
 
-(defn- set-slider! [visible]
-  (swap! canvas-state assoc :slider-active visible))
+(defn- set-slider! [is-visible]
+  (swap! canvas-state assoc :slider-active is-visible))
 
 ;; -------------------------
 ;; Controllers
@@ -211,6 +212,7 @@
        [:div.slider
         [:h3 "Adjust Diameter"]
         [:input {:type "range"
+                 :min minimum-radius
                  :auto-focus true ; makes on-blur event fire
                  :value (r->d r)
                  :on-change #(on-change-diameter! (.. % -target -value))}]]
