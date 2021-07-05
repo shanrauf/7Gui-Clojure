@@ -22,10 +22,16 @@
            :slider-active false}))
 
 ;; Computed properties
-(defn- selected? [id]
-  (= id (:id (:selected-circle @canvas-state))))
+(defn- selected? [c]
+  (= (:id c) (:id (:selected-circle @canvas-state))))
 
-(defn- circle-selected? []
+(defn- same-circles? [c1 c2]
+  (= (:id c1) (:id c2)))
+
+(defn- equivalent-circles? [c1 c2]
+  (= (:r c1) (:r c2)))
+
+(defn- some-circle-selected? []
   (boolean (:selected-circle @canvas-state)))
 
 (defn- popup-active? []
@@ -89,16 +95,19 @@
                 (Math/pow (- x2 x1) 2))))
 
 (defn- get-closest-circle
-  [[x y]]
+  [[x0 y0]]
   (->
    (reduce
     (fn [prev c]
-      (let [curr-distance (distance-between x y (:x c) (:y c))]
-        (if (and (< curr-distance (:r c))
-                 (< curr-distance (:d prev)))
-          {:d curr-distance :c c}
+      (let [{:keys [x y r]} c
+            distance-from-circle (distance-between x0 y0 x y)
+            within-circle? (< distance-from-circle r)
+            closer-circle? (< distance-from-circle (:d prev))]
+        (if (and within-circle?
+                 closer-circle?)
+          {:d distance-from-circle :c c}
           prev)))
-    {:d ##Inf}
+    {:d ##Inf :c nil}
     (:circles @canvas-state))
    :c))
 
@@ -119,8 +128,7 @@
         :else (throw (js/Error. "Radius must be a number > 0")))})
 
 (defn- get-dom-event-coords [e]
-  (let [t (.-currentTarget e)
-        rect (.getBoundingClientRect t)
+  (let [rect (.getBoundingClientRect (.-currentTarget e))
         x (- (.-clientX e) (-> rect .-left int))
         y (- (.-clientY e) (-> rect .-top int))]
     (list x y)))
@@ -129,29 +137,26 @@
   [coords]
   (let [{:keys [circles undo-stack]} @canvas-state
         new-circle (generate-circle nil (first coords) (last coords) default-radius)]
-    (swap! canvas-state assoc
-           :popup-active false
-           :circles (conj circles new-circle))
+    (swap! canvas-state assoc :circles (conj circles new-circle))
     (set-undo-stack! (conj undo-stack circles))
     (set-redo-stack! [])
     new-circle))
 
 (defn- commit-circle-diameter! []
   (let [{:keys [selected-circle circles undo-stack]} @canvas-state]
-    (swap! canvas-state assoc :circles (map #(if (and (= (:id %) (:id selected-circle))
-                                                      (not= (:r %) (:r selected-circle))) selected-circle %) circles))
+    (swap! canvas-state assoc :circles (map #(if (and (same-circles? % selected-circle)
+                                                      (not (equivalent-circles? % selected-circle))) selected-circle %) circles))
     (set-undo-stack! (conj undo-stack circles))
     (set-redo-stack! [])))
 
 (defn- set-selected-circle! [c]
-  (when (not= c (:selected-circle @canvas-state))
-    (swap! canvas-state assoc :selected-circle c))
-  )
+  (swap! canvas-state assoc :selected-circle c))
 
 (defn- select-closest-circle! [coords]
-   (-> coords
+  (-> coords
       (get-closest-circle)
-      (set-selected-circle!)))
+      ((fn [c] (when (not (selected? c))
+                 (set-selected-circle! c))))))
 
 ;; -------------------------
 ;; Popup
@@ -174,7 +179,7 @@
 
 (defn- on-canvas-right-click! [e]
   (.preventDefault e)
-  (when (circle-selected?) (set-popup! true)))
+  (when (some-circle-selected?) (set-popup! true)))
 
 (defn- on-canvas-mouse-move! [e]
   (when (not (popup-active?))
@@ -187,7 +192,6 @@
     (set-selected-circle! (generate-circle id x y r))))
 
 (defn- on-popup-blur! []
-  (swap! canvas-state assoc :popup-active false)
   (commit-circle-diameter!)
   (set-selected-circle! nil)
   (set-slider! false)
@@ -220,12 +224,14 @@
                                :auto-focus true ; makes on-blur event fire
                                :on-click #(set-slider! true)} "Adjust Diameter..."])]))
 
-(defn- circle [{:keys [id x y r]}]
-  [:circle {:class (when (selected? id) "selected-circle")
-            :key id
-            :cx x
-            :cy y
-            :r (if (selected? id) (:r (:selected-circle @canvas-state)) r)}])
+(defn- circle [c]
+  (let [{:keys [id x y r]} c
+        is-selected (selected? c)]
+    [:circle {:class (when is-selected "selected-circle")
+              :key id
+              :cx x
+              :cy y
+              :r (if is-selected (:r (:selected-circle @canvas-state)) r)}]))
 
 (defn- canvas-component []
   [:div.canvas-container
