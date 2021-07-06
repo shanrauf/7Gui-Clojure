@@ -15,7 +15,7 @@
            name
            (throw (js/Error. "Name must be a non-empty string <= 100 characters")))
    :surname (if (and (string? surname) (not= "" surname) (<= (count surname) 100))
-              name
+              surname
               (throw (js/Error. "Surname must be a non-empty string <= 100 characters")))})
 
 (defonce initial-people
