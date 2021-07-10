@@ -5,9 +5,6 @@
 (defonce seconds-per-frame (/ 1 frames-per-second))
 (defonce milliseconds-per-frame (/ 1000 frames-per-second))
 
-(defonce timer-state (r/atom {:elapsed-time 0
-                              :duration 10}))
-
 (defn- update-duration!
   [state new-value]
   (swap! state assoc :duration (js/Number new-value)))
@@ -17,11 +14,11 @@
   (swap! state
          assoc
          :elapsed-time
-         (min (+ (:elapsed-time @timer-state) seconds-per-frame)
-              (:duration @timer-state))))
+         (min (+ (:elapsed-time @state) seconds-per-frame)
+              (:duration @state))))
 
-(defn- start-timer []
-  (js/setInterval #(update-elapsed-time! timer-state)
+(defn- start-timer [state]
+  (js/setInterval #(update-elapsed-time! state)
                   milliseconds-per-frame))
 
 ;; -------------------------
@@ -36,27 +33,29 @@
       (str "s")))
 
 (defn timer-component []
-  (r/create-class
-   {:component-did-mount #(start-timer)
-    :reagent-render
-    (fn []
-      [:div.task.timer
-       [:h2 "Task 4: Timer"]
-       [:div.container
-        [:div {:class "elapsed-time"}
-         [:label "Elapsed time:"]
-         [:meter {:value (:elapsed-time @timer-state)
-                  :max (:duration @timer-state)}]
-         [:p (format-elapsed-time (:elapsed-time @timer-state))]]
-        [:div {:class "input-container"}
-         [:label "Duration"]
-         [:input {:type "range"
-                  :value (:duration @timer-state)
-                  :min 0
-                  :max 100
-                  :on-change #(update-duration! timer-state
-                                                (.. % -target -value))}]]
-        [:button.custom-button {:type "button"
-                                :on-click #(swap! timer-state
-                                                  assoc
-                                                  :elapsed-time 0)} "Reset"]]])}))
+  (let [state (r/atom {:elapsed-time 0
+                       :duration 10})]
+    (r/create-class
+     {:component-did-mount #(start-timer state)
+      :reagent-render
+      (fn []
+        [:div.task.timer
+         [:h2 "Task 4: Timer"]
+         [:div.container
+          [:div.elapsed-time
+           [:label "Elapsed time:"]
+           [:meter {:value (:elapsed-time @state)
+                    :max (:duration @state)}]
+           [:p (format-elapsed-time (:elapsed-time @state))]]
+          [:div.input-container
+           [:label "Duration"]
+           [:input {:type "range"
+                    :value (:duration @state)
+                    :min 0
+                    :max 100
+                    :on-change #(update-duration! state
+                                                  (.. % -target -value))}]]
+          [:button.custom-button {:type "button"
+                                  :on-click #(swap! state
+                                                    assoc
+                                                    :elapsed-time 0)} "Reset"]]])})))

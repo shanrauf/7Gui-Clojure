@@ -11,12 +11,16 @@
          (and (string? id) (uuid-str? id)) id
          (nil? id) (str (random-uuid))
          :else (throw (js/Error. "Id must be a UUID string")))
-   :name (if (and (string? name) (not= "" name) (<= (count name) 100))
+   :name (if (and (string? name)
+                  (not= "" name)
+                  (<= (count name) 100))
            name
-           (throw (js/Error. "Name must be a non-empty string <= 100 characters")))
-   :surname (if (and (string? surname) (not= "" surname) (<= (count surname) 100))
+           (throw (js/Error. "Name must be a string <= 100 chars")))
+   :surname (if (and (string? surname)
+                     (not= "" surname)
+                     (<= (count surname) 100))
               surname
-              (throw (js/Error. "Surname must be a non-empty string <= 100 characters")))})
+              (throw (js/Error. "Surname must be a string <= 100 chars")))})
 
 (defonce initial-people
   [(generate-person nil "Conor" "White-Sullivan")
@@ -136,10 +140,9 @@
   (str surname ", " name))
 
 (defn- people-list [{:keys [value people on-change]}]
-  [:select {:class "people-list"
-            :size 3
-            :value value
-            :on-change on-change}
+  [:select.people-list {:size 3
+                        :value value
+                        :on-change on-change}
    (for [person people]
      [:option {:value (:id person)
                :key (:id person)} (format-name (:name person)
@@ -148,43 +151,44 @@
 (defn crud-component []
   (let [state (r/atom initial-state)]
     (fn []
-      [:div {:class "task"}
-       [:h2 "Task 5: CRUD"]
-       (let [{:keys [input-name
-                     input-surname
-                     input-prefix
-                     selected-id
-                     people]} @state]
-         [:div.container
-          [:div.input-container
-           [:label "Filter prefix"]
-           [:input {:value input-prefix
-                    :on-change #(on-prefix-update! state (.. % -target -value))}]]
-          [:div
-           [people-list {:people (filter-people people input-prefix)
-                         :value selected-id
-                         :on-change #(on-input-update! state :selected-id
-                                                       (.. % -target -value))}]]
-          [:div.input-container
-           [:label "Name:"]
-           [:input {:class (when (not (valid-name? state)) "invalid-input")
-                    :value input-name
-                    :on-change #(swap! state
-                                       assoc
-                                       :input-name
-                                       (.. % -target -value))}]]
-          [:div.input-container
-           [:label "Surname:"]
-           [:input {:class (when (not (valid-surname? state)) "invalid-input")
-                    :value input-surname
-                    :on-change #(swap! state
-                                       assoc
-                                       :input-surname
-                                       (.. % -target -value))}]]
-          [:div.buttons
-           [:button.custom-button {:disabled (not (can-create? state))
-                                   :on-click #(on-person-action! state "create")} "Create"]
-           [:button.custom-button {:disabled (not (can-update? state))
-                                   :on-click #(on-person-action! state "update")} "Update"]
-           [:button.custom-button {:disabled (not (can-delete? state))
-                                   :on-click #(on-person-action! state "delete")} "Delete"]]])])))
+      (let [{:keys [input-name
+                    input-surname
+                    input-prefix
+                    selected-id
+                    people]} @state]
+        [:div.task
+         [:h2 "Task 5: CRUD"]
+
+         [:div.input-container
+          [:label "Filter prefix"]
+          [:input {:value input-prefix
+                   :on-change #(on-prefix-update! state
+                                                  (.. % -target -value))}]]
+         [people-list {:people (filter-people people input-prefix)
+                       :value selected-id
+                       :on-change #(on-input-update! state
+                                                     :selected-id
+                                                     (.. % -target -value))}]
+         [:div.input-container
+          [:label "Name:"]
+          [:input {:class (when (not (valid-name? state)) "invalid-input")
+                   :value input-name
+                   :on-change #(swap! state
+                                      assoc
+                                      :input-name
+                                      (.. % -target -value))}]]
+         [:div.input-container
+          [:label "Surname:"]
+          [:input {:class (when (not (valid-surname? state)) "invalid-input")
+                   :value input-surname
+                   :on-change #(swap! state
+                                      assoc
+                                      :input-surname
+                                      (.. % -target -value))}]]
+         [:div.buttons
+          [:button.custom-button {:disabled (not (can-create? state))
+                                  :on-click #(on-person-action! state "create")} "Create"]
+          [:button.custom-button {:disabled (not (can-update? state))
+                                  :on-click #(on-person-action! state "update")} "Update"]
+          [:button.custom-button {:disabled (not (can-delete? state))
+                                  :on-click #(on-person-action! state "delete")} "Delete"]]]))))

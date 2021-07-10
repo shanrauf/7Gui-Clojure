@@ -156,11 +156,11 @@
 (defn- set-selected-circle! [state c]
   (swap! state assoc :selected-circle c))
 
-(defn- select-closest-circle! [state coords] ; TODO ->> ???
+(defn- select-closest-circle! [state coords]
   (->> coords
        (get-closest-circle state)
-       ((fn [c] (when (not (selected? state c))
-                  (set-selected-circle! state c))))))
+       (#(when (not (selected? state %))
+           (set-selected-circle! state %)))))
 
 ;; -------------------------
 ;; Popup
@@ -221,11 +221,11 @@
         [:h3 "Adjust Diameter"]
         [:input {:type "range"
                  :min minimum-radius
-                 :auto-focus true ; makes on-blur event fire
+                 :auto-focus true
                  :value (r->d r)
                  :on-change #(on-change-diameter! state (.. % -target -value))}]]
        [:button.custom-button {:type "button"
-                               :auto-focus true ; makes on-blur event fire
+                               :auto-focus true
                                :on-click #(set-slider! state true)}
         "Adjust Diameter..."])]))
 
@@ -249,7 +249,7 @@
 (defn circle-drawer-component []
   (let [state (r/atom canvas-state)]
     (fn []
-      [:div {:class "task"}
+      [:div.task
        [:h2 "Task 6: Circle Drawer"]
        [:button.custom-button {:type "button"
                                :disabled (not (can-undo? state))
