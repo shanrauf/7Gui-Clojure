@@ -135,19 +135,22 @@ return cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$4(state,cljs.core.assoc,
 sevengui.crud.select_first_visible_person_BANG_ = (function sevengui$crud$select_first_visible_person_BANG_(state){
 return sevengui.crud.set_selected_person_BANG_(state,sevengui.crud.get_first_visible_person(state));
 });
+sevengui.crud.select_person_or_first_visible_BANG_ = (function sevengui$crud$select_person_or_first_visible_BANG_(state,id){
+if(cljs.core.not(sevengui.crud.find_person(id,sevengui.crud.filtered_people_list(state)))){
+return sevengui.crud.select_first_visible_person_BANG_(state);
+} else {
+return sevengui.crud.set_selected_person_BANG_(state,id);
+}
+});
 sevengui.crud.on_person_action_BANG_ = (function sevengui$crud$on_person_action_BANG_(state,action){
 var G__14007 = action;
 switch (G__14007) {
 case "create":
-return sevengui.crud.set_selected_person_BANG_(state,sevengui.crud.create_person_BANG_(state));
+return sevengui.crud.select_person_or_first_visible_BANG_(state,sevengui.crud.create_person_BANG_(state));
 
 break;
 case "update":
-if(cljs.core.truth_(sevengui.crud.find_person(sevengui.crud.update_person_BANG_(state),sevengui.crud.filtered_people_list(state)))){
-return null;
-} else {
-return sevengui.crud.select_first_visible_person_BANG_(state);
-}
+return sevengui.crud.select_person_or_first_visible_BANG_(state,sevengui.crud.update_person_BANG_(state));
 
 break;
 case "delete":
