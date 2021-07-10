@@ -1,6 +1,6 @@
 # 7gui-clojure
 
-My implementation of 7GUI in Clojure
+My implementation of 7GUI in Clojure (live demo [here](https://friendly-lamport-37fe13.netlify.app/))
 
 ![Site screenshot](./resources/site-screenshot.png)
 
