@@ -2,17 +2,12 @@
 
 My implementation of 7GUI in Clojure
 
-# Setup
-
-Install Clojure and Leiningen
-
-# Development
-Run `lein fig:build` and open http://localhost:9500/
+![Site screenshot](./resources/site-screenshot.png)
 
 # Cells
 
 - Strictly follows behavior of 7GUI spec AND Excel
-- Easily modify column/row counts, add operations, add new expression syntax, etc
+- Easily modify column/row counts, add operations, create new expression syntax, etc
 
 ## Operations
 
@@ -46,3 +41,13 @@ Run `lein fig:build` and open http://localhost:9500/
 - Space to start editting a cell
 - Type anything to override cell with what you typed
 - Backspace/Delete to clear a cell
+
+# Setup
+
+Install Clojure and Leiningen
+
+## Development
+Run `lein fig:build` and open http://localhost:9500/
+
+## Production
+Switch to `site` branch, run `lein fig:prod`,  move resources/public files into target/public, and commit changes (Netlify auto-deploys)
