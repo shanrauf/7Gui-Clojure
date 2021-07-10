@@ -121,7 +121,8 @@
   (let [ref (str/upper-case ref)
         sheet (:sheet state)]
     (if (is-ref-range? ref)
-      (map #(resolve-cell-refs state cell-ref %) (range->references ref))
+      (flatten (map #(resolve-cell-refs state cell-ref %)
+                    (range->references ref)))
       (->> ref
            (check-for-self-reference cell-ref)
            (check-for-circular-reference sheet cell-ref)
