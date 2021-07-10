@@ -77,9 +77,11 @@
   (re-find operator-regex expr))
 
 (defn eval-operation [s-expr]
-  (let [operator (first s-expr)
-        args (rest s-expr)]
-    (operator args)))
+  (if (empty? s-expr)
+    0
+    (let [operator (first s-expr)
+          args (rest s-expr)]
+      (operator args))))
 
 (defn operator-sym->operator [symbol]
   (let [operator (get operators (->> symbol str str/lower-case keyword))]

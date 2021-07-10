@@ -79,17 +79,16 @@
                               :A3 "2"      :B3 "=𐃏"}
           state (init-state (generate-spreadsheet-state) initial-cell-exprs)
           sheet (:sheet state)
-          id "B1"]
-      (let [cell (get-cell sheet id)
-            expr "=SUM(A1:A3)"
-            expected 4]
-        (on-update-cell! state cell expr)
-        (is (= (ref->value sheet id) expected))
-        (let [dependee-id "A1"
-              dependee (get-cell sheet dependee-id)
-              new-expr "2"
-              new-expected 5]
-          (on-update-cell! state dependee new-expr)
-          (is (= (ref->value sheet id) new-expected)))))))
+          id "B1"
+          cell (get-cell sheet id)
+          expr "=SUM(A1:A3)"
+          dependee-id "A1"
+          expected 4
+          new-expr "2"
+          new-expected 5]
+      (on-update-cell! state cell expr)
+      (is (= (ref->value sheet id) expected))
+      (on-update-cell! state (get-cell sheet dependee-id) new-expr)
+      (is (= (ref->value sheet id) new-expected)))))
 
 (run-tests)

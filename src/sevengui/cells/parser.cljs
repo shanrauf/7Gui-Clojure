@@ -1,9 +1,8 @@
 (ns sevengui.views.cells.parser
   (:require [clojure.string :as str]
             [cljs.reader :as reader]
-            [sevengui.views.cells.operator :refer [has-operator? operator-regex]]))
-
-(defonce list-regex #"^(\s*\(.*\)\s*)$")
+            [sevengui.views.cells.operator :refer [has-operator?
+                                                   operator-regex]]))
 
 (defn- special-form? [expr]
   (try
