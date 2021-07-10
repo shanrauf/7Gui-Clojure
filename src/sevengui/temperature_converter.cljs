@@ -1,15 +1,13 @@
 (ns sevengui.views.temperature-converter
   (:require [reagent.core :as r]))
 
-(defonce temperatures (r/atom {:fahrenheit "" :celsius ""}))
-
 (defn- f->c [f]
   (* (- f 32) (/ 5 9)))
 
 (defn- c->f [c]
   (+ (* c (/ 9 5)) 32))
 
-(defn- update-temperatures [modified-temp invalidated-temp input]
+(defn- update-temperatures [temperatures modified-temp invalidated-temp input]
   (cond
     ;; Empty input
     (= input "") (swap! temperatures assoc modified-temp input invalidated-temp input)
@@ -31,20 +29,23 @@
 (defn- format-temperature [temp]
   (if (string? temp) temp (str (Math/round (float temp)))))
 
-(defn- temperature-input-component [updated-temp invalidated-temp val]
+(defn- temperature-input-component [temperatures updated-temp invalidated-temp val]
   [:input {:class (when (and (not-empty val) (js/isNaN val)) "invalid-input")
            :value val
-           :on-change #(update-temperatures updated-temp
+           :on-change #(update-temperatures temperatures
+                                            updated-temp
                                             invalidated-temp
                                             (.. % -target -value))}])
 (defn temperature-converter-component []
-  [:div.task.temperature-converter
-   [:h2 "Task 2: Temperature Converter"]
-   (let [{:keys [fahrenheit celsius]} @temperatures]
-     [:div.container
-      [:div {:class "input-container"}
-       [:label "Celsius:"]
-       [temperature-input-component :celsius :fahrenheit (format-temperature celsius)]]
-      [:div {:class "input-container"}
-       [:label "Fahrenheit:"]
-       [temperature-input-component :fahrenheit :celsius (format-temperature fahrenheit)]]])])
+  (let [temperatures (r/atom {:fahrenheit "" :celsius ""})]
+    (fn []
+      [:div.task.temperature-converter
+       [:h2 "Task 2: Temperature Converter"]
+       (let [{:keys [fahrenheit celsius]} @temperatures]
+         [:div.container
+          [:div {:class "input-container"}
+           [:label "Celsius:"]
+           [temperature-input-component temperatures :celsius :fahrenheit (format-temperature celsius)]]
+          [:div {:class "input-container"}
+           [:label "Fahrenheit:"]
+           [temperature-input-component temperatures :fahrenheit :celsius (format-temperature fahrenheit)]]])])))
