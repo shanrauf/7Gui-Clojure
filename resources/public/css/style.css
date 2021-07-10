@@ -1,10 +1,14 @@
+@import "./global.css";
+@import "./cells.css";
+@import "./input-range.css";
+
 * {
   box-sizing: border-box;
   margin: 0;
 }
 
 body {
-  background-color: #ecf0f3;
+  background-color: var(--default-background);
   color: #555;
   font-family: Roboto;
 }
@@ -20,6 +24,28 @@ h2 {
   padding: 0;
 }
 
+.app ::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+  box-shadow: 0 0 1px 0 black;
+}
+
+.app ::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.app ::-webkit-scrollbar-corner {
+  background: #555;
+}
+
+.app ::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+  position: relative;
+}
+
 .custom-button {
   outline: none;
   border: none;
@@ -33,7 +59,7 @@ h2 {
   color: #fff;
   text-align: center;
   margin: 10px;
-  background: #27ddb6;
+  background: var(--default-secondary);
   box-shadow:  1px 1px 5px #21bc9b,
               -1px -1px 5px #2dfed1;
 }
@@ -66,7 +92,7 @@ input {
   color: #555;
   padding: 5px 1em 5px 1em;
   border-radius: 25px;
-  box-shadow: inset 8px 8px 8px #cbced1, inset -8px -8px 8px #ffffff;
+  box-shadow: inset 8px 8px 8px var(--neumorphic-shadow), inset -8px -8px 8px #ffffff;
 }
 
 .invalid-input {
@@ -104,8 +130,9 @@ input {
   padding: 30px 20px;
   margin: 10px 10px 20px 10px;
   border-radius: 40px;
-  background: #ecf0f3;
-  box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #ffffff;
+  background: var(--default-background);
+  box-shadow: 12px 12px 24px #ced3d9,
+              -12px -12px 24px #f2f7ff;
 }
 
 .counter, .temperature-converter {
@@ -125,7 +152,7 @@ select {
   outline: 0;
   box-shadow: none;
   border: 0 !important;
-  background: #ecf0f3;
+  background: var(--default-background);
   background-image: none;
 }
 /* Remove IE arrow */
@@ -140,7 +167,7 @@ select::-ms-expand {
   width: 20em;
   height: 2em;
   line-height: 2;
-  background: #ecf0f3;
+  background: var(--default-background);
   overflow: hidden;
   border-radius: 20px;
   background: linear-gradient(145deg, #fdffff, #d4d8db);
@@ -160,7 +187,7 @@ select {
   top: 0;
   right: 0;
   padding: 0 0.5em;
-  background: #ecf0f3;
+  background: var(--default-background);
   cursor: pointer;
   pointer-events: none;
   -webkit-transition: .25s all ease;
@@ -238,7 +265,7 @@ select {
 }
 
 .canvas-container circle {
-  stroke: #27ddb6;
+  stroke: var(--default-secondary);
   fill: #0000;
   z-index: 99;
 }

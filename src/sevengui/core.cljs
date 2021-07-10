@@ -9,7 +9,7 @@
    [sevengui.views.timer :as timer]
    [sevengui.views.crud :as crud]
    [sevengui.views.circle-drawer :as circle-drawer]
-   [sevengui.views.cells :as cells]))
+   [sevengui.views.cells.cells :as cells]))
 
 (defn seven-gui-roam []
   [:div.seven-gui-roam

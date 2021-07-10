@@ -233,7 +233,7 @@
                                :on-click #(set-slider! true)}
         "Adjust Diameter..."])]))
 
-(defn- circle [c]
+(defn- circle-component [c]
   (let [{:keys [id x y r]} c
         is-selected (selected? c)]
     [:circle {:class (when is-selected "selected-circle")
@@ -247,7 +247,7 @@
    [:svg {:on-click #(on-canvas-left-click! %)
           :on-mouse-move #(on-canvas-mouse-move! %)
           :on-context-menu #(on-canvas-right-click! %)}
-    (doall (map circle (:circles @canvas-state)))]
+    (doall (map circle-component (:circles @canvas-state)))]
    (when (popup-active?) [popup-component])])
 
 (defn circle-drawer-component []
