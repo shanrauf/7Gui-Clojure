@@ -24,38 +24,37 @@
    (generate-person nil "Bardia" "Pourvakil")
    (generate-person nil "Shan" "Rauf")])
 
-(defonce component-state
-  (r/atom {:people (vec initial-people)
-           :input-name ""
-           :input-surname ""
-           :input-prefix ""
-           :selected-id (:id (first initial-people))}))
+(defonce initial-state {:people (vec initial-people)
+                        :input-name ""
+                        :input-surname ""
+                        :input-prefix ""
+                        :selected-id (:id (first initial-people))})
 
 ;; Computed properties
-(defn- valid-name? []
-  (boolean (not-empty (:input-name @component-state))))
+(defn- valid-name? [state]
+  (boolean (not-empty (:input-name @state))))
 
-(defn- valid-surname? []
-  (boolean (not-empty (:input-surname @component-state))))
+(defn- valid-surname? [state]
+  (boolean (not-empty (:input-surname @state))))
 
-(defn- valid-full-name? []
-  (and (valid-name?)
-       (valid-surname?)))
+(defn- valid-full-name? [state]
+  (and (valid-name? state)
+       (valid-surname? state)))
 
-(defn- someone-selected? []
-  (boolean (not-empty (:selected-id @component-state))))
+(defn- someone-selected? [state]
+  (boolean (not-empty (:selected-id @state))))
 
-(defn- person-selected? [p]
-  (= (:id p) (:selected-id @component-state)))
+(defn- person-selected? [state p]
+  (= (:id p) (:selected-id @state)))
 
-(defn- can-create? []
-  (valid-full-name?))
+(defn- can-create? [state]
+  (valid-full-name? state))
 
-(defn- can-update? []
-  (and (someone-selected?) (valid-full-name?)))
+(defn- can-update? [state]
+  (and (someone-selected? state) (valid-full-name? state)))
 
-(defn- can-delete? []
-  (someone-selected?))
+(defn- can-delete? [state]
+  (someone-selected? state))
 
 ;; -------------------------
 ;; People
@@ -69,16 +68,16 @@
   [id people]
   (first (keep-indexed #(when (= (:id %2) id) %1) people)))
 
-(defn- filtered-people-list []
-  (let [{:keys [input-prefix people]} @component-state]
+(defn- filtered-people-list [state]
+  (let [{:keys [input-prefix people]} @state]
     (if (= "" input-prefix)
       people
       (filter-people people input-prefix))))
 
-(defn- get-first-visible-person []
-  (let [{:keys [input-prefix people]} @component-state]
+(defn- get-first-visible-person [state]
+  (let [{:keys [input-prefix people]} @state]
     (cond
-      input-prefix (or (:id (first (filtered-people-list)))
+      input-prefix (or (:id (first (filtered-people-list state)))
                        "")
       :else (if (empty? people) "" (:id (first people))))))
 
@@ -86,51 +85,51 @@
 ;; CRUD
 
 ;; -------------------------
-(defn- create-person! []
-  (let [{:keys [input-name input-surname people]} @component-state
+(defn- create-person! [state]
+  (let [{:keys [input-name input-surname people]} @state
         new-person-uuid (str (random-uuid))
         new-person (generate-person new-person-uuid input-name input-surname)]
-    (swap! component-state assoc :people (conj people new-person))
+    (swap! state assoc :people (conj people new-person))
     new-person-uuid))
 
-(defn- update-person! []
-  (let [{:keys [input-name input-surname selected-id people]} @component-state
+(defn- update-person! [state]
+  (let [{:keys [input-name input-surname selected-id people]} @state
         new-person (generate-person selected-id input-name input-surname)]
-    (swap! component-state assoc :people (vec (map #(if (person-selected? %)
-                                                      new-person
-                                                      %) people)))
+    (swap! state assoc :people (vec (map #(if (person-selected? state %)
+                                            new-person
+                                            %) people)))
     selected-id))
 
-(defn- delete-person! []
-  (swap! component-state assoc :people (filterv #(not (person-selected? %))
-                                                (:people @component-state))))
+(defn- delete-person! [state]
+  (swap! state assoc :people (filterv #(not (person-selected? state %))
+                                      (:people @state))))
 
-(defn- set-selected-person! [id]
-  (swap! component-state assoc :selected-id id))
+(defn- set-selected-person! [state id]
+  (swap! state assoc :selected-id id))
 
-(defn- select-first-visible-person! []
-  (set-selected-person! (get-first-visible-person)))
+(defn- select-first-visible-person! [state]
+  (set-selected-person! state (get-first-visible-person state)))
 
 ;; -------------------------
 ;; Controller
 
 ;; -------------------------
-(defn- on-person-action! [action]
+(defn- on-person-action! [state action]
   (case action
-    "create" (-> (create-person!)
-                 (set-selected-person!))
-    "update" (-> (update-person!)
-                 (find-person (filtered-people-list))
-                 (when-not (select-first-visible-person!)))
-    "delete" ((delete-person!)
-              (select-first-visible-person!))))
+    "create" (->> (create-person! state)
+                  (set-selected-person! state))
+    "update" (->> (update-person! state)
+                  (find-person (filtered-people-list state))
+                  (when-not (select-first-visible-person! state)))
+    "delete" ((delete-person! state)
+              (select-first-visible-person! state))))
 
-(defn- on-input-update! [input-key new-value]
-  (swap! component-state assoc input-key new-value))
+(defn- on-input-update! [state input-key new-value]
+  (swap! state assoc input-key new-value))
 
-(defn- on-prefix-update! [new-value]
-  (on-input-update! :input-prefix new-value)
-  (select-first-visible-person!))
+(defn- on-prefix-update! [state new-value]
+  (on-input-update! state :input-prefix new-value)
+  (select-first-visible-person! state))
 
 ;; -------------------------
 ;; View
@@ -139,9 +138,10 @@
 (defn- format-name [name surname]
   (str surname ", " name))
 
-(defn- people-list [{:keys [items on-change]}]
+(defn- people-list [{:keys [value items on-change]}]
   [:select {:class "people-list"
             :size 3
+            :value value
             :on-change on-change}
    (for [item items]
      [:option {:value (:id item)
@@ -149,41 +149,45 @@
                                              (:surname item))])])
 
 (defn crud-component []
-  [:div {:class "task"}
-   [:h2 "Task 5: CRUD"]
-   (let [{:keys [input-name
-                 input-surname
-                 input-prefix
-                 people]} @component-state]
-     [:div.container
-      [:div.input-container
-       [:label "Filter prefix"]
-       [:input {:value input-prefix
-                :on-change #(on-prefix-update! (.. % -target -value))}]]
-      [:div
-       [people-list {:items (filter-people people input-prefix)
-                     :on-change #(on-input-update! :selected-id
-                                                   (.. % -target -value))}]]
-      [:div.input-container
-       [:label "Name:"]
-       [:input {:class (when (not (valid-name?)) "invalid-input")
-                :value input-name
-                :on-change #(swap! component-state
-                                   assoc
-                                   :input-name
-                                   (.. % -target -value))}]]
-      [:div.input-container
-       [:label "Surname:"]
-       [:input {:class (when (not (valid-surname?)) "invalid-input")
-                :value input-surname
-                :on-change #(swap! component-state
-                                   assoc
-                                   :input-surname
-                                   (.. % -target -value))}]]
-      [:div.buttons
-       [:button.custom-button {:disabled (not (can-create?))
-                               :on-click #(on-person-action! "create")} "Create"]
-       [:button.custom-button {:disabled (not (can-update?))
-                               :on-click #(on-person-action! "update")} "Update"]
-       [:button.custom-button {:disabled (not (can-delete?))
-                               :on-click #(on-person-action! "delete")} "Delete"]]])])
+  (let [state (r/atom initial-state)]
+    (fn []
+      [:div {:class "task"}
+       [:h2 "Task 5: CRUD"]
+       (let [{:keys [input-name
+                     input-surname
+                     input-prefix
+                     selected-id
+                     people]} @state]
+         [:div.container
+          [:div.input-container
+           [:label "Filter prefix"]
+           [:input {:value input-prefix
+                    :on-change #(on-prefix-update! state (.. % -target -value))}]]
+          [:div
+           [people-list {:items (filter-people people input-prefix)
+                         :value selected-id
+                         :on-change #(on-input-update! state :selected-id
+                                                       (.. % -target -value))}]]
+          [:div.input-container
+           [:label "Name:"]
+           [:input {:class (when (not (valid-name? state)) "invalid-input")
+                    :value input-name
+                    :on-change #(swap! state
+                                       assoc
+                                       :input-name
+                                       (.. % -target -value))}]]
+          [:div.input-container
+           [:label "Surname:"]
+           [:input {:class (when (not (valid-surname? state)) "invalid-input")
+                    :value input-surname
+                    :on-change #(swap! state
+                                       assoc
+                                       :input-surname
+                                       (.. % -target -value))}]]
+          [:div.buttons
+           [:button.custom-button {:disabled (not (can-create? state))
+                                   :on-click #(on-person-action! state "create")} "Create"]
+           [:button.custom-button {:disabled (not (can-update? state))
+                                   :on-click #(on-person-action! state "update")} "Update"]
+           [:button.custom-button {:disabled (not (can-delete? state))
+                                   :on-click #(on-person-action! state "delete")} "Delete"]]])])))
