@@ -21,21 +21,21 @@
 ;; Logic
 
 ;; -------------------------
-(defn- str-to-date [s]
+(defn- str->date [s]
   (let [[_ day month year] (re-matches date-regex s)
         date (.parse js/Date (str month "/" day "/" year))]
     date))
 
 (defn- valid-date-str? [s]
-  (re-matches date-regex s))
+  (boolean (re-matches date-regex s)))
 
 (defn- valid-departure-date? [d] (valid-date-str? d))
 
 (defn- valid-arrival-date? [d a]
   (and (valid-date-str? a)
-       (< (str-to-date d) (str-to-date a))))
+       (< (str->date d) (str->date a))))
 
-(defn- update-date [date, input]
+(defn- update-date! [date, input]
   (reset! date input))
 
 (defn- ready-to-submit? []
@@ -79,8 +79,8 @@
      [:input {:class (when (not (valid-departure-date? @departure-date)) "invalid-input")
               :value @departure-date
               :placeholder "(e.g. 27.03.2014)"
-              :on-change #(update-date departure-date
-                                       (.. % -target -value))}]]
+              :on-change #(update-date! departure-date
+                                        (.. % -target -value))}]]
     [:div.input-container
      [:label "Arrival Date:"]
      [:input {:class (when (and (= @flight-type return-flight)
@@ -89,8 +89,8 @@
               :value @arrival-date
               :disabled (= @flight-type one-way-flight)
               :placeholder "(e.g. 28.03.2014)"
-              :on-change #(update-date arrival-date
-                                       (.. % -target -value))}]]
+              :on-change #(update-date! arrival-date
+                                        (.. % -target -value))}]]
     [:button.custom-button {:type "button"
                             :disabled (ready-to-submit?)
                             :on-click #(on-submit %)} "Book"]]])

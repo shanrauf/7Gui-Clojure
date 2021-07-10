@@ -1,16 +1,8 @@
 (ns sevengui.views.temperature-converter
   (:require [reagent.core :as r]))
 
-;; -------------------------
-;; Component state
-
-;; -------------------------
 (defonce temperatures (r/atom {:fahrenheit "" :celsius ""}))
 
-;; -------------------------
-;; Logic
-
-;; -------------------------
 (defn- f->c [f]
   (* (- f 32) (/ 5 9)))
 

@@ -1,29 +1,16 @@
 (ns sevengui.views.timer
   (:require [reagent.core :as r]))
 
-;; -------------------------
-;; Constants
-
-;; -------------------------
 (defonce frames-per-second 60)
 (defonce seconds-per-frame (/ 1 frames-per-second))
 (defonce milliseconds-per-frame (/ 1000 frames-per-second))
 
-;; -------------------------
-;; Component state
-
-;; -------------------------
 (defonce timer-state (r/atom {:elapsed-time 0
                               :duration 10}))
 
-;; -------------------------
-;; Logic
-
-;; -------------------------
 (defn- update-duration!
   [state new-value]
   (swap! state assoc :duration (js/Number new-value)))
-
 
 (defn- update-elapsed-time!
   [state]

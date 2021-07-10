@@ -217,15 +217,6 @@ select {
                -5px -5px 10px #ffffff;
 }
 
-@media only screen and (max-width: 800px) {
-  h1 {
-    font-size: 2em;
-  }
-  .tasks {
-    display: block;
-  }
-}
-
 /* Scrollbar */
 .people-list::-webkit-scrollbar-track
 {
@@ -289,4 +280,13 @@ select {
 .popup h3 {
   color: #555;
   margin-bottom: 0.3em;
+}
+
+@media only screen and (max-width: 800px) {
+  h1 {
+    font-size: 2em;
+  }
+  .tasks {
+    display: block;
+  }
 }
