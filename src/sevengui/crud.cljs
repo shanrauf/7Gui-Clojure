@@ -108,6 +108,12 @@
 (defn- set-selected-person! [state id]
   (swap! state assoc :selected-id id))
 
+(defn- set-input-name! [state name]
+  (swap! state assoc :input-name name))
+
+(defn- set-input-surname! [state surname]
+  (swap! state assoc :input-surname surname))
+
 (defn- select-first-visible-person! [state]
   (set-selected-person! state (get-first-visible-person state)))
 
@@ -173,22 +179,24 @@
           [:label "Name:"]
           [:input {:class (when (not (valid-name? state)) "invalid-input")
                    :value input-name
-                   :on-change #(swap! state
-                                      assoc
-                                      :input-name
-                                      (.. % -target -value))}]]
+                   :on-change #(set-input-name! state
+                                                (.. % -target -value))}]]
          [:div.input-container
           [:label "Surname:"]
           [:input {:class (when (not (valid-surname? state)) "invalid-input")
                    :value input-surname
-                   :on-change #(swap! state
-                                      assoc
-                                      :input-surname
-                                      (.. % -target -value))}]]
+                   :on-change #(set-input-surname! state
+                                                   (.. % -target -value))}]]
          [:div.buttons
           [:button.custom-button {:disabled (not (can-create? state))
-                                  :on-click #(on-person-action! state "create")} "Create"]
+                                  :on-click #(on-person-action! state
+                                                                "create")}
+           "Create"]
           [:button.custom-button {:disabled (not (can-update? state))
-                                  :on-click #(on-person-action! state "update")} "Update"]
+                                  :on-click #(on-person-action! state
+                                                                "update")}
+           "Update"]
           [:button.custom-button {:disabled (not (can-delete? state))
-                                  :on-click #(on-person-action! state "delete")} "Delete"]]]))))
+                                  :on-click #(on-person-action! state
+                                                                "delete")}
+           "Delete"]]]))))

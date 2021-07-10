@@ -5,20 +5,19 @@
 (defonce seconds-per-frame (/ 1 frames-per-second))
 (defonce milliseconds-per-frame (/ 1000 frames-per-second))
 
-(defn- update-duration!
-  [state new-value]
+(defn- set-elapsed-time! [state time]
+  (swap! state assoc :elapsed-time time))
+
+(defn- set-duration! [state new-value]
   (swap! state assoc :duration (js/Number new-value)))
 
-(defn- update-elapsed-time!
-  [state]
-  (swap! state
-         assoc
-         :elapsed-time
-         (min (+ (:elapsed-time @state) seconds-per-frame)
-              (:duration @state))))
+(defn- tick-elapsed-time! [state]
+  (set-elapsed-time! state
+                     (min (+ (:elapsed-time @state) seconds-per-frame)
+                          (:duration @state))))
 
 (defn- start-timer [state]
-  (js/setInterval #(update-elapsed-time! state)
+  (js/setInterval #(tick-elapsed-time! state)
                   milliseconds-per-frame))
 
 ;; -------------------------
@@ -53,9 +52,8 @@
                     :value (:duration @state)
                     :min 0
                     :max 100
-                    :on-change #(update-duration! state
-                                                  (.. % -target -value))}]]
+                    :on-change #(set-duration! state
+                                               (.. % -target -value))}]]
           [:button.custom-button {:type "button"
-                                  :on-click #(swap! state
-                                                    assoc
-                                                    :elapsed-time 0)} "Reset"]]])})))
+                                  :on-click #(set-elapsed-time! state 0)}
+           "Reset"]]])})))

@@ -13,7 +13,7 @@
 ;; Model
 
 ;; -------------------------
-(defonce canvas-state
+(defonce initial-state
   {:circles []
    :selected-circle nil
    :undo-stack []
@@ -223,7 +223,8 @@
                  :min minimum-radius
                  :auto-focus true
                  :value (r->d r)
-                 :on-change #(on-change-diameter! state (.. % -target -value))}]]
+                 :on-change #(on-change-diameter! state
+                                                  (.. % -target -value))}]]
        [:button.custom-button {:type "button"
                                :auto-focus true
                                :on-click #(set-slider! state true)}
@@ -247,7 +248,7 @@
    (when (popup-active? state) [popup-component state])])
 
 (defn circle-drawer-component []
-  (let [state (r/atom canvas-state)]
+  (let [state (r/atom initial-state)]
     (fn []
       [:div.task
        [:h2 "Task 6: Circle Drawer"]

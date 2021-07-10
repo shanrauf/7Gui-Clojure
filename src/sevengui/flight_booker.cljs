@@ -66,24 +66,29 @@
          [:form.custom-form
           [:div.custom-select
            [:select {:type "select"
-                     :on-change #(set-flight-type! state (.. % -target -value))}
+                     :on-change #(set-flight-type! state
+                                                   (.. % -target -value))}
             [:option {:value one-way-flight} "One-way flight"]
             [:option {:value return-flight} "Return flight"]]]
           [:div.input-container
            [:label "Departure Date:"]
-           [:input {:class (when (not (valid-departure-date? departure-date)) "invalid-input")
+           [:input {:class (when (not (valid-departure-date? departure-date))
+                             "invalid-input")
                     :value departure-date
                     :placeholder "(e.g. 27.03.2014)"
-                    :on-change #(set-departure-date! state (.. % -target -value))}]]
+                    :on-change #(set-departure-date! state
+                                                     (.. % -target -value))}]]
           [:div.input-container
            [:label "Arrival Date:"]
            [:input {:class (when (and (= flight-type return-flight)
                                       (not (valid-arrival-date? departure-date
-                                                                arrival-date))) "invalid-input")
+                                                                arrival-date)))
+                             "invalid-input")
                     :value arrival-date
                     :disabled (= flight-type one-way-flight)
                     :placeholder "(e.g. 28.03.2014)"
-                    :on-change #(set-arrival-date! state (.. % -target -value))}]]
+                    :on-change #(set-arrival-date! state
+                                                   (.. % -target -value))}]]
           [:button.custom-button {:type "button"
                                   :disabled (ready-to-submit? flight-type
                                                               departure-date
@@ -91,4 +96,5 @@
                                   :on-click #(on-submit %
                                                         flight-type
                                                         departure-date
-                                                        arrival-date)} "Book"]])])))
+                                                        arrival-date)}
+           "Book"]])])))

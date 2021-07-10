@@ -10,7 +10,9 @@
 (defn- update-temperatures [temperatures modified-temp invalidated-temp input]
   (cond
     ;; Empty input
-    (= input "") (swap! temperatures assoc modified-temp input invalidated-temp input)
+    (= input "") (swap! temperatures assoc
+                        modified-temp input
+                        invalidated-temp input)
     ;; Invalid input
     (js/isNaN input) (swap! temperatures assoc modified-temp input)
     ;; Valid input
@@ -26,26 +28,28 @@
 ;; View
 
 ;; -------------------------
-(defn- format-temperature [temp]
+(defn- format-temp [temp]
   (if (string? temp) temp (str (Math/round (float temp)))))
 
-(defn- temperature-input-component [temperatures updated-temp invalidated-temp val]
-  [:input {:class (when (and (not-empty val) (js/isNaN val)) "invalid-input")
-           :value val
-           :on-change #(update-temperatures temperatures
-                                            updated-temp
-                                            invalidated-temp
-                                            (.. % -target -value))}])
+(defn- temperature-input [state updated-temp val]
+  (let [invalidated-temp (if (= updated-temp :celsius)
+                           :fahrenheit
+                           :celsius)]
+    [:input {:class (when (and (not-empty val) (js/isNaN val)) "invalid-input")
+             :value val
+             :on-change #(update-temperatures state
+                                              updated-temp
+                                              invalidated-temp
+                                              (.. % -target -value))}]))
 (defn temperature-converter-component []
-  (let [temperatures (r/atom {:fahrenheit "" :celsius ""})]
+  (let [state (r/atom {:fahrenheit "" :celsius ""})]
     (fn []
-      [:div.task.temperature-converter
-       [:h2 "Task 2: Temperature Converter"]
-       (let [{:keys [fahrenheit celsius]} @temperatures]
-         [:div.container
-          [:div.input-container
-           [:label "Celsius:"]
-           [temperature-input-component temperatures :celsius :fahrenheit (format-temperature celsius)]]
-          [:div.input-container
-           [:label "Fahrenheit:"]
-           [temperature-input-component temperatures :fahrenheit :celsius (format-temperature fahrenheit)]]])])))
+      (let [{:keys [fahrenheit celsius]} @state]
+        [:div.task.temperature-converter
+         [:h2 "Task 2: Temperature Converter"]
+         [:div.input-container
+          [:label "Celsius:"]
+          [temperature-input state :celsius (format-temp celsius)]]
+         [:div.input-container
+          [:label "Fahrenheit:"]
+          [temperature-input state :fahrenheit (format-temp fahrenheit)]]]))))
