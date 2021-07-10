@@ -1,10 +1,10 @@
-(ns sevengui.views.cells.parser
+(ns sevengui.cells.parser
   (:require [clojure.string :as str]
             [cljs.reader :as reader]
-            [sevengui.views.cells.cell-ref :refer [is-ref-range?]]
-            [sevengui.views.cells.operator :refer [has-operator?
-                                                   operator-regex]]
-            [sevengui.views.cells.error :refer [throw-error value-error]]))
+            [sevengui.cells.cell-ref :refer [is-ref-range?]]
+            [sevengui.cells.operator :refer [has-operator?
+                                             operator-regex]]
+            [sevengui.cells.error :refer [throw-error value-error]]))
 
 (defonce list-regex #"^(\s*\(.*\)\s*)$")
 

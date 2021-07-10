@@ -1,4 +1,4 @@
-(ns sevengui.views.timer
+(ns sevengui.timer
   (:require [reagent.core :as r]))
 
 (defonce frames-per-second 60)

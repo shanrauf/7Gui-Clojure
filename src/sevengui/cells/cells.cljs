@@ -1,17 +1,17 @@
-(ns sevengui.views.cells.cells
+(ns sevengui.cells.cells
   (:require [reagent.core :as r]
             [clojure.set :as set]
-            [sevengui.views.cells.parser :refer [m-parse-cell-expr]]
-            [sevengui.views.cells.resolver :refer [resolve-cell-expr]]
-            [sevengui.views.cells.error :refer [log-error
-                                                get-error-name]]
-            [sevengui.views.cells.cell-ref :refer [find-refs
-                                                   expand-ranges
-                                                   value-or-number
-                                                   generate-cell-ref
-                                                   get-cell
-                                                   columns
-                                                   rows]]))
+            [sevengui.cells.parser :refer [m-parse-cell-expr]]
+            [sevengui.cells.resolver :refer [resolve-cell-expr]]
+            [sevengui.cells.error :refer [log-error
+                                          get-error-name]]
+            [sevengui.cells.cell-ref :refer [find-refs
+                                             expand-ranges
+                                             value-or-number
+                                             generate-cell-ref
+                                             get-cell
+                                             columns
+                                             rows]]))
 
 ;; -------------------------
 ;; Sheet

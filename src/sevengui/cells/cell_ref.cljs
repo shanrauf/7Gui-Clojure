@@ -1,9 +1,9 @@
-(ns sevengui.views.cells.cell-ref
+(ns sevengui.cells.cell-ref
   (:require [clojure.string :as str]
-            [sevengui.views.cells.error :refer [throw-error
-                                                ref-error
-                                                circular-ref-error
-                                                name-error]]))
+            [sevengui.cells.error :refer [throw-error
+                                          ref-error
+                                          circular-ref-error
+                                          name-error]]))
 
 (defonce ref-regex #"([a-zA-Z]+)(\d\d*)")
 (defonce ref-col-regex #"^[a-zA-Z]+$")

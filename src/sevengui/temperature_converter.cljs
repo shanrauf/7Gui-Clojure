@@ -1,4 +1,4 @@
-(ns sevengui.views.temperature-converter
+(ns sevengui.temperature-converter
   (:require [reagent.core :as r]))
 
 (defn- f->c [f]

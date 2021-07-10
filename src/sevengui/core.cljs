@@ -3,13 +3,13 @@
   (:require
    [reagent.dom :as d]
    [goog.string.format]
-   [sevengui.views.counter :as counter]
-   [sevengui.views.temperature-converter :as temperature-converter]
-   [sevengui.views.flight-booker :as flight-booker]
-   [sevengui.views.timer :as timer]
-   [sevengui.views.crud :as crud]
-   [sevengui.views.circle-drawer :as circle-drawer]
-   [sevengui.views.cells.cells :as cells]))
+   [sevengui.counter :as counter]
+   [sevengui.temperature-converter :as temperature-converter]
+   [sevengui.flight-booker :as flight-booker]
+   [sevengui.timer :as timer]
+   [sevengui.crud :as crud]
+   [sevengui.circle-drawer :as circle-drawer]
+   [sevengui.cells.cells :as cells]))
 
 (defn seven-gui-roam []
   [:div.seven-gui-roam

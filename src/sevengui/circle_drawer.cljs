@@ -1,4 +1,4 @@
-(ns sevengui.views.circle-drawer
+(ns sevengui.circle-drawer
   (:require [reagent.core :as r]
             [sevengui.util :refer [uuid-str?]]))
 

@@ -1,11 +1,11 @@
 (ns sevengui.cells.test-cells
   (:require [cljs.test :refer-macros [deftest is testing run-tests]]
-            [sevengui.views.cells.cells :refer [generate-spreadsheet-state
-                                                on-update-cell!
-                                                extract-refs
-                                                eval-cell-expr]]
-            [sevengui.views.cells.cell-ref :refer [get-cell ref->value]]
-            [sevengui.views.cells.parser :refer [m-parse-cell-expr]]))
+            [sevengui.cells.cells :refer [generate-spreadsheet-state
+                                          on-update-cell!
+                                          extract-refs
+                                          eval-cell-expr]]
+            [sevengui.cells.cell-ref :refer [get-cell ref->value]]
+            [sevengui.cells.parser :refer [m-parse-cell-expr]]))
 
 (defn init-state [state initial-cell-exprs]
   (let [sheet (:sheet state)]

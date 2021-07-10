@@ -1,6 +1,6 @@
-(ns sevengui.views.cells.operator
+(ns sevengui.cells.operator
   (:require [clojure.string :as str]
-            [sevengui.views.cells.error :refer [throw-error operator-error value-error]]))
+            [sevengui.cells.error :refer [throw-error operator-error value-error]]))
 
 (defonce operator-regex #"(?i)([A-Z]+)\s*\((.*)?\)")
 

@@ -1,4 +1,4 @@
-(ns sevengui.views.flight-booker
+(ns sevengui.flight-booker
   (:require [reagent.core :as r]))
 
 (defonce one-way-flight "one-way")

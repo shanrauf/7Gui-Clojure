@@ -17,4 +17,5 @@
                                   [rebel-readline-cljs "0.1.1-SNAPSHOT"]]}}
 
   :aliases {"fig"       ["trampoline" "run" "-m" "figwheel.main"]
-            "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "sevengui" "-r"]})
+            "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "sevengui" "-r"]
+            "fig:prod"  ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "sevengui"]})

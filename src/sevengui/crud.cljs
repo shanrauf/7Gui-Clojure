@@ -1,4 +1,4 @@
-(ns sevengui.views.crud
+(ns sevengui.crud
   (:require [reagent.core :as r]
             [sevengui.util :refer [uuid-str?]]))
 

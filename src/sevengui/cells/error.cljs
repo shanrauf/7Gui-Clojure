@@ -1,4 +1,4 @@
-(ns sevengui.views.cells.error)
+(ns sevengui.cells.error)
 
 ;; -------------------------
 ;; Errors

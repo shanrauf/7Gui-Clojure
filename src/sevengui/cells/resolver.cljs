@@ -1,9 +1,9 @@
-(ns sevengui.views.cells.resolver
-  (:require [sevengui.views.cells.operator :refer [eval-operation
-                                                   operator-sym->operator]]
-            [sevengui.views.cells.cell-ref :refer [resolve-cell-refs
-                                                   cell-reference-pattern?]]
-            [sevengui.views.cells.error :refer [throw-error value-error]]))
+(ns sevengui.cells.resolver
+  (:require [sevengui.cells.operator :refer [eval-operation
+                                             operator-sym->operator]]
+            [sevengui.cells.cell-ref :refer [resolve-cell-refs
+                                             cell-reference-pattern?]]
+            [sevengui.cells.error :refer [throw-error value-error]]))
 
 (defn- resolve-symbol [state id sym]
   (cond

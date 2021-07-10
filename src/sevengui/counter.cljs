@@ -1,4 +1,4 @@
-(ns sevengui.views.counter
+(ns sevengui.counter
   (:require [reagent.core :as r]))
 
 (defn counter-component []
