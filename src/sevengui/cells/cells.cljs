@@ -153,7 +153,8 @@
     (when (contains? #{"Enter" "Tab"} key)
       (on-update-cell! state cell (.. e -target -value)))
     (when (= key "Escape")
-      (set-editting! cell false)
+      (swap! cell assoc :input "" :is-editting false)
+
       (.focus parent))
     (when (= key "Enter")
       (move-focus parent :down))))
