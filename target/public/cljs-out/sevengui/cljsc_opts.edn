@@ -1,0 +1,1 @@
+{:optimizations :advanced, :main sevengui.core, :output-to "target/public/cljs-out/sevengui-main.js", :output-dir "target/public/cljs-out/sevengui", :asset-path "/cljs-out/sevengui", :aot-cache false}

@@ -1,0 +1,121 @@
+@import "./global.css";
+
+.cells-container {
+  width: 100%;
+  height: 900px;
+  margin: 40px 0 40px 0;
+}
+
+.cells-container h2 {
+  font-size: 2em;
+}
+
+.cells {
+  width: 100%;
+  height: 900px;
+  overflow: auto;
+}
+
+.cells table {
+  width: 600px;
+  height: 900px;
+  border-spacing: 0;
+  color: #212121;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6),
+  -9px -9px 16px rgba(255, 255, 255, 0.6);
+}
+
+table thead {
+  box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6);
+}
+
+table th {
+  padding: 7px;
+}
+
+table > tbody > tr:hover {
+  padding: 20px;
+  box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6),
+  -9px -9px 16px rgba(255, 255, 255, 0.6);
+}
+
+table > tbody > tr > td {
+  width: 100%;
+  min-width: 150px;
+  padding: 10px;
+  height: 30px;
+  outline: none;
+  font-size: 14px;
+  position: relative;
+}
+
+.cells .row {
+  font-weight: 600;
+}
+
+.cell:focus-within {
+  font-weight: 600;
+  border: 3px solid var(--default-secondary);
+  border-radius: 5px;
+}
+
+.cells input {
+  width: 100%;
+  height: 100%;
+}
+
+.cells .invalid-input {
+  box-shadow: inset 0 0 6px red;
+}
+
+table tr td:first-child::before {
+  content: "";
+  position: absolute;
+  padding: 7px;
+  top: 0;
+  left: -5000px;
+  width: 10000px;
+  height: 100%;
+  z-index: -10;
+}
+
+table td:hover::after {
+  content: "";
+  position: absolute;
+  box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6),
+  -9px -9px 16px rgba(255, 255, 255, 0.6);
+  left: 0;
+  top: -5000px;
+  height: 10000px;
+  width: 100%;
+  z-index: -1;
+}
+
+/* Scrollbar */
+.cells::-webkit-scrollbar-track
+{
+	box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+.cells::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: #F5F5F5;
+}
+
+.cells::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	box-shadow: inset 0 0 10px rgba(0,0,0,.3);
+	background-color: var(--default-gray);
+}
+
+@media only screen and (max-width: 800px) {
+  .cells {
+    width: 400px;
+  }
+}
