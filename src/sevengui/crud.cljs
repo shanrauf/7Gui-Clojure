@@ -3,7 +3,7 @@
             [sevengui.util :refer [uuid-str?]]))
 
 ;; -------------------------
-;; Model
+;; People
 
 ;; -------------------------
 (defn- generate-person [id name surname]
@@ -56,10 +56,6 @@
 (defn- can-delete? [state]
   (someone-selected? state))
 
-;; -------------------------
-;; People
-
-;; -------------------------
 (defn- filter-people
   [people prefix]
   (filter #(.includes (.toLowerCase (% :surname)) prefix) people))
@@ -79,7 +75,8 @@
     (cond
       input-prefix (or (:id (first (filtered-people-list state)))
                        "")
-      :else (if (empty? people) "" (:id (first people))))))
+      (empty? people) ""
+      :else (:id (first people)))))
 
 ;; -------------------------
 ;; CRUD
@@ -118,9 +115,9 @@
   (case action
     "create" (->> (create-person! state)
                   (set-selected-person! state))
-    "update" (->> (update-person! state)
-                  (find-person (filtered-people-list state))
-                  (when-not (select-first-visible-person! state)))
+    "update" (-> (update-person! state)
+                 (find-person (filtered-people-list state))
+                 (when-not (select-first-visible-person! state)))
     "delete" ((delete-person! state)
               (select-first-visible-person! state))))
 
@@ -138,15 +135,15 @@
 (defn- format-name [name surname]
   (str surname ", " name))
 
-(defn- people-list [{:keys [value items on-change]}]
+(defn- people-list [{:keys [value people on-change]}]
   [:select {:class "people-list"
             :size 3
             :value value
             :on-change on-change}
-   (for [item items]
-     [:option {:value (:id item)
-               :key (:id item)} (format-name (:name item)
-                                             (:surname item))])])
+   (for [person people]
+     [:option {:value (:id person)
+               :key (:id person)} (format-name (:name person)
+                                               (:surname person))])])
 
 (defn crud-component []
   (let [state (r/atom initial-state)]
@@ -164,7 +161,7 @@
            [:input {:value input-prefix
                     :on-change #(on-prefix-update! state (.. % -target -value))}]]
           [:div
-           [people-list {:items (filter-people people input-prefix)
+           [people-list {:people (filter-people people input-prefix)
                          :value selected-id
                          :on-change #(on-input-update! state :selected-id
                                                        (.. % -target -value))}]]
