@@ -117,6 +117,11 @@
 (defn- select-first-visible-person! [state]
   (set-selected-person! state (get-first-visible-person state)))
 
+(defn- select-person-or-first-visible! [state id]
+  (if (not (find-person id (filtered-people-list state)))
+    (select-first-visible-person! state)
+    (set-selected-person! state id)))
+
 ;; -------------------------
 ;; Controller
 
@@ -124,10 +129,9 @@
 (defn- on-person-action! [state action]
   (case action
     "create" (->> (create-person! state)
-                  (set-selected-person! state))
-    "update" (-> (update-person! state)
-                 (find-person (filtered-people-list state))
-                 (when-not (select-first-visible-person! state)))
+                  (select-person-or-first-visible! state))
+    "update" (->> (update-person! state)
+                  (select-person-or-first-visible! state))
     "delete" ((delete-person! state)
               (select-first-visible-person! state))))
 
