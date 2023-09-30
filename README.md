@@ -1,10 +1,10 @@
 # 7gui-clojure
 
-My implementation of 7GUI in Clojure (live demo [here](https://friendly-lamport-37fe13.netlify.app/))
+My implementation of 7GUI in Clojure (live demo [here](https://7gui-reagent-components.netlify.app/))
 
 ![Site screenshot](./resources/site-screenshot.png)
 
-# Cells
+# Cells (Excel Clone)
 
 - Strictly follows behavior of 7GUI spec AND Excel
 - Easily modify column/row counts, add operations, create new expression syntax, etc
